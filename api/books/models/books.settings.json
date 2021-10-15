@@ -59,6 +59,11 @@
       "plugin": "upload",
       "required": false,
       "pluginOptions": {}
+    },
+    "EBookPDF": {
+      "type": "component",
+      "repeatable": false,
+      "component": "pdf.full-pdf"
     }
   }
 }

@@ -2,7 +2,7 @@
   "name": "ebooks-backend",
   "private": true,
   "version": "0.1.0",
-  "description": "A Strapi application",
+  "description": "eBooks Content Management System",
   "scripts": {
     "develop": "strapi develop",
     "start": "strapi start",
@@ -25,7 +25,7 @@
     "sqlite3": "5.0.0"
   },
   "author": {
-    "name": "A Strapi developer"
+    "name": "Benjamin Brkic"
   },
   "strapi": {
     "uuid": "d4ff76c4-0a36-4a9d-a294-bbc962920e96"

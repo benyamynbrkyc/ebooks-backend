@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_pdf_full_pdfs",
+  "info": {
+    "name": "Full PDF",
+    "icon": "book"
+  },
+  "options": {},
+  "attributes": {
+    "Name": {
+      "type": "string",
+      "required": true
+    },
+    "PDF": {
+      "model": "file",
+      "via": "related",
+      "allowedTypes": [
+        "files"
+      ],
+      "plugin": "upload",
+      "required": true,
+      "pluginOptions": {}
+    }
+  }
+}
