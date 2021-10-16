@@ -14,22 +14,22 @@
   "attributes": {
     "title": {
       "type": "string",
-      "unique": true,
+      "unique": false,
       "required": true
     },
     "author": {
       "type": "string",
       "required": true,
-      "unique": true
+      "unique": false
     },
     "description": {
       "type": "text",
-      "unique": true,
+      "unique": false,
       "required": true
     },
     "price": {
       "type": "decimal",
-      "unique": true,
+      "unique": false,
       "required": true
     },
     "category": {
@@ -47,10 +47,11 @@
     },
     "SKU": {
       "type": "string",
-      "unique": true,
-      "required": false
+      "unique": false,
+      "required": false,
+      "default": "N/A"
     },
-    "EBookPreview": {
+    "e_book_preview": {
       "model": "file",
       "via": "related",
       "allowedTypes": [
@@ -60,10 +61,14 @@
       "required": false,
       "pluginOptions": {}
     },
-    "EBookPDF": {
+    "e_book_pdf": {
       "type": "component",
       "repeatable": false,
       "component": "pdf.full-pdf"
+    },
+    "in_stock": {
+      "type": "integer",
+      "default": 50
     }
   }
 }
