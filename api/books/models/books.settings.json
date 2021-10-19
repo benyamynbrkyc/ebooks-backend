@@ -69,6 +69,11 @@
     "in_stock": {
       "type": "integer",
       "default": 50
+    },
+    "Sponsored": {
+      "type": "boolean",
+      "default": false,
+      "unique": true
     }
   }
 }

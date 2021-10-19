@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "description": "eBooks Content Management System",
   "scripts": {
-    "develop": "strapi develop --watch-admin",
+    "develop": "strapi develop",
+    "develop-admin": "strapi develop --watch-admin",
     "start": "strapi start",
     "build": "strapi build",
     "strapi": "strapi"
