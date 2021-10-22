@@ -85,11 +85,14 @@ module.exports = {
       delete updateData.password;
     }
 
-    const data = await strapi.plugins["users-permissions"].services.user.edit(
+    await strapi.plugins["users-permissions"].services.user.edit(
       { id },
       updateData
     );
 
+    const data = await strapi
+      .query("user", "users-permissions")
+      .findOne({ id }, ["role", "books"]);
     ctx.send(data);
   },
 };

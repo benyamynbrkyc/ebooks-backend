@@ -59,7 +59,7 @@
       "plugin": "users-permissions",
       "configurable": false
     },
-    "books": {
+    "owned_books": {
       "collection": "books"
     },
     "subscribed": {
@@ -67,6 +67,16 @@
       "default": false,
       "required": true,
       "unique": true
+    },
+    "first_name": {
+      "type": "string",
+      "default": "FIrst Name",
+      "required": true,
+      "unique": false
+    },
+    "last_name": {
+      "type": "string",
+      "required": true
     }
   }
 }

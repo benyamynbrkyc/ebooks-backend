@@ -70,7 +70,7 @@
       "type": "integer",
       "default": 50
     },
-    "Sponsored": {
+    "sponsored": {
       "type": "boolean",
       "default": false,
       "unique": true
