@@ -92,7 +92,7 @@ module.exports = {
 
     const data = await strapi
       .query("user", "users-permissions")
-      .findOne({ id }, ["role", "books"]);
+      .findOne({ id }, ["role", "owned_books"]);
     ctx.send(data);
   },
 };
