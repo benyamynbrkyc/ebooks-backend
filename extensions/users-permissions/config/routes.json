@@ -437,6 +437,15 @@
             }
         },
         {
+            "method": "POST",
+            "path": "/users/processOrder",
+            "handler": "User.processOrder",
+            "config": {
+                "policies": [],
+                "prefix": ""
+            }
+        },
+        {
             "method": "PUT",
             "path": "/users/:id",
             "handler": "User.update",

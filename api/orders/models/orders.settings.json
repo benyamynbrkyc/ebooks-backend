@@ -1,0 +1,28 @@
+{
+  "kind": "collectionType",
+  "collectionName": "orders",
+  "info": {
+    "name": "Orders",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "paypal_order_id": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "books": {
+      "collection": "books"
+    },
+    "user": {
+      "plugin": "users-permissions",
+      "model": "user",
+      "via": "order"
+    }
+  }
+}

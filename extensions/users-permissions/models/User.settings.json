@@ -77,6 +77,15 @@
     "last_name": {
       "type": "string",
       "required": true
+    },
+    "author": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "order": {
+      "via": "user",
+      "model": "orders"
     }
   }
 }
