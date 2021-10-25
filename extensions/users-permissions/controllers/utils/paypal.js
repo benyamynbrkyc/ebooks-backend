@@ -56,10 +56,10 @@ const verifyPayPalOrderId = async (clientOrderId) => {
     const { data } = await axios(config);
 
     if (data.id) {
-      return { message: "OK", data };
+      return { status: "OK", data };
     }
   } catch (error) {
-    return { message: "NOT_FOUND" };
+    return { status: "NOT_FOUND" };
   }
 };
 

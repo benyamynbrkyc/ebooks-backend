@@ -23,6 +23,16 @@
       "plugin": "users-permissions",
       "model": "user",
       "via": "order"
+    },
+    "Book": {
+      "type": "component",
+      "repeatable": true,
+      "component": "books.books"
+    },
+    "completed": {
+      "type": "boolean",
+      "default": false,
+      "required": true
     }
   }
 }

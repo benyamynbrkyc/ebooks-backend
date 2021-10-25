@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_books_books",
+  "info": {
+    "name": "books",
+    "icon": "book-open",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": false
+    },
+    "quantity": {
+      "type": "integer",
+      "required": true,
+      "unique": false
+    },
+    "book_id": {
+      "type": "integer",
+      "required": true,
+      "unique": false
+    }
+  }
+}

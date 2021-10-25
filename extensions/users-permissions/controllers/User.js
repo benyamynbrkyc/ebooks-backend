@@ -172,17 +172,29 @@ module.exports = {
       ...ctx.request.body,
     };
 
-    const verifyData = await verifyPayPalOrderId(body.orderId);
+    console.log(body);
 
-    if (verifyData.message === "OK") {
-      ctx.send({ orderId: body.orderId, ...verifyData });
+    const verifyData = await verifyPayPalOrderId(body.orderId);
+    const status = verifyData.status;
+
+    if (status === "OK") {
+      const paypalOrderId = verifyData.data.id;
+
+      const orderobj = {
+        paypalOrderId,
+        userId: ctx.state.user.id,
+        bookIds: body.bookIds,
+      };
+
+      console.log(orderobj);
+
+      ctx.send({
+        orderId: body.orderId,
+        status,
+        paypalOrderId,
+      });
     } else {
-      return ctx.badRequest(
-        null,
-        formatError({
-          message: "Does not exist",
-        })
-      );
+      return ctx.badRequest("Does not exist");
     }
   },
 };
