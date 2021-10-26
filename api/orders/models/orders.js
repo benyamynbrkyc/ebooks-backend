@@ -1,8 +1,27 @@
-'use strict';
+"use strict";
 
-/**
- * Read the documentation (https://strapi.io/documentation/developer-docs/latest/development/backend-customization.html#lifecycle-hooks)
- * to customize this model
- */
+module.exports = {
+  lifecycles: {
+    async afterCreate(result, data) {
+      //   const id = result.streakID;
+      //   const streak = strapi.services.streaks.findOne({
+      //     id,
+      //   });
 
-module.exports = {};
+      //   strapi.services.streaks.update(
+      //     {
+      //       id,
+      //     },
+      //     {
+      //       counter: streak.counter++,
+      //     }
+      //   );
+      const orderId = result.id;
+      const userId = data.user.id;
+      await strapi.services.orders.update(
+        { id: orderId },
+        { user: { id: userId } }
+      );
+    },
+  },
+};

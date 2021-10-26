@@ -65,27 +65,23 @@
     "subscribed": {
       "type": "boolean",
       "default": false,
-      "required": true,
-      "unique": true
+      "required": false,
+      "unique": false
     },
     "first_name": {
       "type": "string",
       "default": "FIrst Name",
-      "required": true,
+      "required": false,
       "unique": false
     },
     "last_name": {
       "type": "string",
-      "required": true
+      "required": false
     },
     "author": {
       "type": "boolean",
       "default": false,
-      "required": true
-    },
-    "order": {
-      "via": "user",
-      "model": "orders"
+      "required": false
     }
   }
 }

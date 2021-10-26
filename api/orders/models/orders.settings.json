@@ -19,11 +19,6 @@
     "books": {
       "collection": "books"
     },
-    "user": {
-      "plugin": "users-permissions",
-      "model": "user",
-      "via": "order"
-    },
     "Book": {
       "type": "component",
       "repeatable": true,
@@ -33,6 +28,10 @@
       "type": "boolean",
       "default": false,
       "required": true
+    },
+    "user": {
+      "plugin": "users-permissions",
+      "model": "user"
     }
   }
 }

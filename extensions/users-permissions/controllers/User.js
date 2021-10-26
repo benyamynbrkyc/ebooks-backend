@@ -180,13 +180,33 @@ module.exports = {
     if (status === "OK") {
       const paypalOrderId = verifyData.data.id;
 
-      const orderobj = {
-        paypalOrderId,
-        userId: ctx.state.user.id,
-        bookIds: body.bookIds,
+      const orderObj = {
+        paypal_order_id: paypalOrderId,
+        books: body.bookIds.map((bookId) => {
+          return { id: bookId };
+        }),
+        user: { id: body.userId },
+        Book: body.books.map((book) => {
+          return {
+            title: book.title,
+            quantity: book.quantity,
+            book_id: book.book_id,
+          };
+        }),
+        completed: false,
       };
 
-      console.log(orderobj);
+      console.log(orderObj);
+
+      ctx.send(orderObj);
+
+      try {
+        const entity = await strapi.query("orders").create(orderObj);
+        // const entity = await strapi.
+        return ctx.send({ message: "CREATED", entity });
+      } catch (error) {
+        return ctx.badRequest(error);
+      }
 
       ctx.send({
         orderId: body.orderId,
