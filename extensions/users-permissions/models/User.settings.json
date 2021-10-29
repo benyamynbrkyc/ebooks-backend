@@ -85,6 +85,9 @@
     },
     "books_in_library": {
       "collection": "books"
+    },
+    "subscription_details": {
+      "type": "text"
     }
   }
 }

@@ -37,11 +37,6 @@ const verifyPayPalOrderId = async (clientOrderId) => {
     process.env.PAYPAL_SANDBOX_URL + "/v2/checkout/orders/" + clientOrderId;
 
   const payPalAccessToken = await getPayPalAccessToken();
-  // const config = {
-  //   headers: {
-  //     Authorization: `Bearer ${payPalAccessToken}`,
-  //   },
-  // };
 
   try {
     const config = {

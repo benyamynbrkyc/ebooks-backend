@@ -2,6 +2,7 @@ const _ = require("lodash");
 const { sanitizeEntity } = require("strapi-utils");
 
 const { verifyPayPalOrderId } = require("./utils/paypal");
+const { verifyUser } = require("./utils/user");
 
 const sanitizeUser = (user) =>
   sanitizeEntity(user, {
@@ -14,71 +15,12 @@ const formatError = (error) => [
 
 module.exports = {
   async updateMe(ctx) {
-    const advancedConfigs = await strapi
-      .store({
-        environment: "",
-        type: "plugin",
-        name: "users-permissions",
-        key: "advanced",
-      })
-      .get();
-
     const { id } = ctx.state.user;
-    const { email, username, password } = ctx.request.body;
-
     const user = await strapi.plugins["users-permissions"].services.user.fetch({
       id,
     });
 
-    // verify user
-    if (_.has(ctx.request.body, "email") && !email) {
-      return ctx.badRequest("email.notNull");
-    }
-    if (_.has(ctx.request.body, "username") && !username) {
-      return ctx.badRequest("username.notNull");
-    }
-
-    if (
-      _.has(ctx.request.body, "password") &&
-      !password &&
-      user.provider === "local"
-    ) {
-      return ctx.badRequest("password.notNull");
-    }
-
-    if (_.has(ctx.request.body, "username")) {
-      const userWithSameUsername = await strapi
-        .query("user", "users-permissions")
-        .findOne({ username });
-
-      if (userWithSameUsername && userWithSameUsername.id != id) {
-        return ctx.badRequest(
-          null,
-          formatError({
-            id: "Auth.form.error.username.taken",
-            message: "username.alreadyTaken",
-            field: ["username"],
-          })
-        );
-      }
-    }
-
-    if (_.has(ctx.request.body, "email") && advancedConfigs.unique_email) {
-      const userWithSameEmail = await strapi
-        .query("user", "users-permissions")
-        .findOne({ email });
-
-      if (userWithSameEmail && userWithSameEmail.id != id) {
-        return ctx.badRequest(
-          null,
-          formatError({
-            id: "Auth.form.error.email.taken",
-            message: "Email already taken",
-            field: ["email"],
-          })
-        );
-      }
-    }
+    verifyUser(ctx, user);
 
     // update data
     let updateData = {
@@ -102,78 +44,18 @@ module.exports = {
 
   // process order
   async processOrder(ctx) {
-    const advancedConfigs = await strapi
-      .store({
-        environment: "",
-        type: "plugin",
-        name: "users-permissions",
-        key: "advanced",
-      })
-      .get();
-
     const { id } = ctx.state.user;
-    const { email, username, password } = ctx.request.body;
 
     const user = await strapi.plugins["users-permissions"].services.user.fetch({
       id,
     });
 
-    // verify user
-    if (_.has(ctx.request.body, "email") && !email) {
-      return ctx.badRequest("email.notNull");
-    }
-    if (_.has(ctx.request.body, "username") && !username) {
-      return ctx.badRequest("username.notNull");
-    }
-
-    if (
-      _.has(ctx.request.body, "password") &&
-      !password &&
-      user.provider === "local"
-    ) {
-      return ctx.badRequest("password.notNull");
-    }
-
-    if (_.has(ctx.request.body, "username")) {
-      const userWithSameUsername = await strapi
-        .query("user", "users-permissions")
-        .findOne({ username });
-
-      if (userWithSameUsername && userWithSameUsername.id != id) {
-        return ctx.badRequest(
-          null,
-          formatError({
-            id: "Auth.form.error.username.taken",
-            message: "username.alreadyTaken",
-            field: ["username"],
-          })
-        );
-      }
-    }
-
-    if (_.has(ctx.request.body, "email") && advancedConfigs.unique_email) {
-      const userWithSameEmail = await strapi
-        .query("user", "users-permissions")
-        .findOne({ email });
-
-      if (userWithSameEmail && userWithSameEmail.id != id) {
-        return ctx.badRequest(
-          null,
-          formatError({
-            id: "Auth.form.error.email.taken",
-            message: "Email already taken",
-            field: ["email"],
-          })
-        );
-      }
-    }
+    verifyUser(ctx, user);
 
     // update data
     const body = {
       ...ctx.request.body,
     };
-
-    console.log(body);
 
     const verifyData = await verifyPayPalOrderId(body.orderId);
     const status = verifyData.status;
@@ -197,10 +79,6 @@ module.exports = {
         completed: false,
       };
 
-      console.log(orderObj);
-
-      ctx.send(orderObj);
-
       try {
         const entity = await strapi.query("orders").create(orderObj);
         // const entity = await strapi.
@@ -208,18 +86,29 @@ module.exports = {
       } catch (error) {
         return ctx.badRequest(error);
       }
-
-      ctx.send({
-        orderId: body.orderId,
-        status,
-        paypalOrderId,
-      });
     } else {
       return ctx.badRequest("Does not exist");
     }
   },
 
-  async processSubscription(ctx) {},
+  async processSubscription(ctx) {
+    const { id } = ctx.state.user;
+
+    const user = await strapi.plugins["users-permissions"].services.user.fetch({
+      id,
+    });
+
+    verifyUser(ctx, user);
+
+    const { body } = ctx.request;
+    const { subscriptionId } = body;
+    // check if this subscription id exists in paypal and if it belongs to this user
+    // possible responses
+    // "name": "RESOURCE_NOT_FOUND",
+    // status: 'ACTIVE'
+
+    ctx.send({ msg: "hey", body, subscriptionId });
+  },
 
   /**
    * Retrieve authenticated user.
