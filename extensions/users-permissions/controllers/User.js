@@ -1,7 +1,7 @@
 const _ = require("lodash");
 const { sanitizeEntity } = require("strapi-utils");
 
-const { verifyPayPalOrderId } = require("./utils/paypal");
+const { verifyPayPalOrderId, verifySubscriptionId } = require("./utils/paypal");
 const { verifyUser } = require("./utils/user");
 
 const sanitizeUser = (user) =>
@@ -102,12 +102,28 @@ module.exports = {
 
     const { body } = ctx.request;
     const { subscriptionId } = body;
-    // check if this subscription id exists in paypal and if it belongs to this user
-    // possible responses
-    // "name": "RESOURCE_NOT_FOUND",
-    // status: 'ACTIVE'
 
-    ctx.send({ msg: "hey", body, subscriptionId });
+    const subscriptionDetails = await verifySubscriptionId(subscriptionId);
+
+    if (subscriptionDetails.status) {
+      const updatedUser = await strapi.plugins[
+        "users-permissions"
+      ].services.user.edit(
+        { id },
+        {
+          subscribed: true,
+          subscription_details: JSON.stringify(subscriptionDetails),
+        }
+      );
+
+      ctx.send({
+        status: subscriptionDetails.status,
+        subscriptionData: subscriptionDetails,
+        updatedUser,
+      });
+    } else {
+      ctx.send({ error: "NOT_FOUND", body });
+    }
   },
 
   /**

@@ -58,6 +58,33 @@ const verifyPayPalOrderId = async (clientOrderId) => {
   }
 };
 
+const verifySubscriptionId = async (clientSubscriptionId) => {
+  const url =
+    process.env.PAYPAL_SANDBOX_URL +
+    "/v1/billing/subscriptions/" +
+    clientSubscriptionId;
+
+  const payPalAccessToken = await getPayPalAccessToken();
+
+  try {
+    const config = {
+      method: "get",
+      url,
+      headers: {
+        Authorization: `Bearer ${payPalAccessToken}`,
+        "Content-Type": "application/json",
+      },
+    };
+
+    const { data } = await axios(config);
+
+    return data;
+  } catch (error) {
+    return { error };
+  }
+};
+
 module.exports = {
   verifyPayPalOrderId,
+  verifySubscriptionId,
 };
