@@ -444,6 +444,15 @@
             }
         },
         {
+            "method": "POST",
+            "path": "/users/processSubscription",
+            "handler": "User.processSubscription",
+            "config": {
+                "policies": [],
+                "prefix": ""
+            }
+        },
+        {
             "method": "PUT",
             "path": "/users/:id",
             "handler": "User.update",

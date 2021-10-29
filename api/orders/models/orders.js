@@ -3,25 +3,42 @@
 module.exports = {
   lifecycles: {
     async afterCreate(result, data) {
-      //   const id = result.streakID;
-      //   const streak = strapi.services.streaks.findOne({
-      //     id,
-      //   });
-
-      //   strapi.services.streaks.update(
-      //     {
-      //       id,
-      //     },
-      //     {
-      //       counter: streak.counter++,
-      //     }
-      //   );
-      const orderId = result.id;
-      const userId = data.user.id;
-      await strapi.services.orders.update(
-        { id: orderId },
-        { user: { id: userId } }
+      console.log("🚀 ~ file: orders.js ~ line 6 ~ afterCreate ~ data", data);
+      console.log(
+        "🚀 ~ file: orders.js ~ line 6 ~ afterCreate ~ result",
+        result
       );
+
+      try {
+        const orderId = result.id;
+        const userId = data.user.id;
+        await strapi.services.orders.update(
+          { id: orderId },
+          { user: { id: userId } }
+        );
+
+        const user = await strapi.plugins[
+          "users-permissions"
+        ].services.user.fetch({
+          id: userId,
+        });
+
+        const userAlreadyOwnedBooks = user.owned_books;
+
+        console.log(
+          "🚀 ~ file: orders.js ~ line 21 ~ afterCreate ~ user",
+          user
+        );
+
+        await strapi.plugins["users-permissions"].services.user.edit(
+          { id: userId },
+          { owned_books: [...userAlreadyOwnedBooks, ...data.books] }
+        );
+
+        console.log("🚀 , done");
+      } catch (error) {
+        console.error(error);
+      }
     },
   },
 };

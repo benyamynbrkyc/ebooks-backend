@@ -100,6 +100,7 @@ module.exports = {
     ctx.send({ ...data });
   },
 
+  // process order
   async processOrder(ctx) {
     const advancedConfigs = await strapi
       .store({
@@ -216,5 +217,25 @@ module.exports = {
     } else {
       return ctx.badRequest("Does not exist");
     }
+  },
+
+  async processSubscription(ctx) {},
+
+  /**
+   * Retrieve authenticated user.
+   * @return {Object|Array}
+   */
+  async me(ctx) {
+    const { id } = ctx.state.user.id;
+    let data = await strapi.plugins["users-permissions"].services.user.fetch({
+      id,
+    });
+
+    if (data) {
+      data = sanitizeUser(data);
+    }
+
+    // Send 200 `ok`
+    ctx.body = data;
   },
 };

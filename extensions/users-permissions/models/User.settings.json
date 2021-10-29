@@ -82,6 +82,9 @@
       "type": "boolean",
       "default": false,
       "required": false
+    },
+    "books_in_library": {
+      "collection": "books"
     }
   }
 }
