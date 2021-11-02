@@ -49,13 +49,11 @@ const verifyPayPalOrderId = async (clientOrderId) => {
     };
 
     const { data } = await axios(config);
-    console.log("🚀", "data from paypal.js > verifyPayPalOrderId", data);
 
     const transactionId = data.purchase_units[0].payments.captures[0].id;
 
     return { status: "OK", data: { ...data, transactionId } };
   } catch (error) {
-    console.log(error);
     return { status: "NOT_FOUND" };
   }
 };
@@ -97,7 +95,6 @@ const verifySubscriptionId = async (clientSubscriptionId) => {
 };
 
 const cancelSubscription = async (subscriptionId, userId) => {
-  console.log("🚀  ", subscriptionId);
   const url =
     process.env.PAYPAL_SANDBOX_URL +
     "/v1/billing/subscriptions/" +

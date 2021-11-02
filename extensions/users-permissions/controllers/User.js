@@ -88,6 +88,7 @@ module.exports = {
             title: book.title,
             quantity: book.quantity,
             book_id: book.book_id,
+            edition: book.edition,
           };
         }),
         paypal_user: paypalUser,
@@ -96,10 +97,9 @@ module.exports = {
 
       try {
         const entity = await strapi.query("orders").create(orderObj);
-        // const entity = await strapi.
         return ctx.send({ message: "CREATED", entity });
       } catch (error) {
-        console.log("error");
+        console.log(error);
         return ctx.badRequest(error);
       }
     } else {
@@ -125,8 +125,6 @@ module.exports = {
         payer_id: verifyData.data.payer.payer_id,
       };
 
-      console.log(JSON.stringify(paypalUser, undefined, 2));
-
       const orderObj = {
         paypal_order_id: paypalOrderId,
         paypal_transaction_id: paypalTransactionId,
@@ -138,6 +136,7 @@ module.exports = {
             title: book.title,
             quantity: book.quantity,
             book_id: book.book_id,
+            edition: book.edition,
           };
         }),
         paypal_user: paypalUser,
@@ -146,14 +145,12 @@ module.exports = {
 
       try {
         const entity = await strapi.query("orders").create(orderObj);
-        // const entity = await strapi.
         return ctx.send({ message: "CREATED", entity });
       } catch (error) {
-        console.log("error");
+        console.log(error);
         return ctx.badRequest(error);
       }
     } else {
-      console.log("here");
       return ctx.badRequest("Does not exist");
     }
   },
@@ -237,10 +234,6 @@ module.exports = {
           subscriptionPaypal.id,
           id
         );
-        console.log(
-          "🚀 ~ file: User.js ~ line 157 ~ cancelSubscription ~ cancelledSubscription",
-          cancelledSubscription
-        );
 
         ctx.send({
           subscriptionId,
@@ -252,7 +245,6 @@ module.exports = {
         ctx.badRequest(error);
       }
     } else {
-      console.log("no subpaypal status, sending error");
       ctx.send({
         error: subscriptionPaypal.error,
         ...subscriptionPaypal,

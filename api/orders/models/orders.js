@@ -3,11 +3,6 @@
 module.exports = {
   lifecycles: {
     async afterCreate(result, data) {
-      console.log("🚀 ~ file: orders.js ~ line 6 ~ afterCreate ~ data", data);
-      console.log(
-        "🚀 ~ file: orders.js ~ line 6 ~ afterCreate ~ result",
-        result
-      );
       if (data.user) {
         try {
           const orderId = result.id;
@@ -23,19 +18,33 @@ module.exports = {
             id: userId,
           });
 
-          const userAlreadyOwnedBooks = user.owned_books;
-
-          // const ebooks = data.books.filter(book=> book.)
-          console.log(data.books);
-
+          const userAlreadyOwnedBooksIds = user.owned_books.map(
+            (book) => book.id
+          );
           console.log(
-            "🚀 ~ file: orders.js ~ line 21 ~ afterCreate ~ user",
-            user
+            "🚀 ~ file: orders.js ~ line 27 ~ afterCreate ~ userAlreadyOwnedBooks",
+            userAlreadyOwnedBooksIds
+          );
+
+          const newBooksIds = data.Book.filter(
+            (book) => book.edition === "ebook"
+          ).map((book) => book.book_id);
+          console.log(
+            "🚀 ~ file: orders.js ~ line 28 ~ afterCreate ~ newBooks",
+            newBooksIds
+          );
+
+          let owned_books = [...userAlreadyOwnedBooksIds, ...newBooksIds];
+          console.log(
+            "🚀 ~ file: orders.js ~ line 30 ~ afterCreate ~ owned_books",
+            owned_books
           );
 
           await strapi.plugins["users-permissions"].services.user.edit(
             { id: userId },
-            { owned_books: [...userAlreadyOwnedBooks, ...data.books] }
+            {
+              owned_books,
+            }
           );
 
           console.log("🚀 , done");

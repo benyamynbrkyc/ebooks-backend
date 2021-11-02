@@ -21,6 +21,9 @@
       "type": "integer",
       "required": true,
       "unique": false
+    },
+    "edition": {
+      "type": "string"
     }
   }
 }
