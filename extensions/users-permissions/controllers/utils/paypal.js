@@ -49,15 +49,23 @@ const verifyPayPalOrderId = async (clientOrderId) => {
     };
 
     const { data } = await axios(config);
+    console.log("🚀", "data from paypal.js > verifyPayPalOrderId", data);
 
-    if (data.id) {
-      return { status: "OK", data };
-    }
+    const transactionId = data.purchase_units[0].payments.captures[0].id;
+
+    return { status: "OK", data: { ...data, transactionId } };
   } catch (error) {
+    console.log(error);
     return { status: "NOT_FOUND" };
   }
 };
 
+const getTransactionId = async (orderId) => {
+  const url =
+    process.env.PAYPAL_SANDBOX_URL + "/v2/checkout/orders/" + clientOrderId;
+};
+
+// find if subscription id exists and return the subscription object
 const verifySubscriptionId = async (clientSubscriptionId) => {
   const url =
     process.env.PAYPAL_SANDBOX_URL +
@@ -78,13 +86,63 @@ const verifySubscriptionId = async (clientSubscriptionId) => {
 
     const { data } = await axios(config);
 
-    return data;
+    if (data.status) {
+      return { subscription: data };
+    } else {
+      throw new error({ error: "NOT_FOUND" });
+    }
   } catch (error) {
-    return { error };
+    throw new Error(error);
+  }
+};
+
+const cancelSubscription = async (subscriptionId, userId) => {
+  console.log("🚀  ", subscriptionId);
+  const url =
+    process.env.PAYPAL_SANDBOX_URL +
+    "/v1/billing/subscriptions/" +
+    subscriptionId +
+    "/cancel";
+
+  const payPalAccessToken = await getPayPalAccessToken();
+
+  const config = {
+    method: "post",
+    url,
+    headers: {
+      Authorization: `Bearer ${payPalAccessToken}`,
+      "Content-Type": "application/json",
+    },
+    data: {
+      reason: "Cancel the subscription",
+    },
+  };
+
+  try {
+    const { data } = await axios(config);
+
+    const updatedUser = await strapi.plugins[
+      "users-permissions"
+    ].services.user.edit(
+      { id: userId },
+      {
+        isSubscriber: false,
+        subscription_details: JSON.stringify({}),
+      }
+    );
+
+    return {
+      message: "Successfully cancelled subscription.",
+      updatedUser,
+      data,
+    };
+  } catch (error) {
+    throw new Error({ message: "Error cancelling subscription.", error });
   }
 };
 
 module.exports = {
   verifyPayPalOrderId,
   verifySubscriptionId,
+  cancelSubscription,
 };

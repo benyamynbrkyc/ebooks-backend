@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_paypal_user_paypal_users",
+  "info": {
+    "name": "paypal_user",
+    "icon": "address-book",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "email_address": {
+      "type": "string"
+    },
+    "payer_id": {
+      "type": "string"
+    }
+  }
+}

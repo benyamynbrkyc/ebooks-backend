@@ -1,7 +1,11 @@
 const _ = require("lodash");
 const { sanitizeEntity } = require("strapi-utils");
 
-const { verifyPayPalOrderId, verifySubscriptionId } = require("./utils/paypal");
+const {
+  verifyPayPalOrderId,
+  verifySubscriptionId,
+  cancelSubscription,
+} = require("./utils/paypal");
 const { verifyUser } = require("./utils/user");
 
 const sanitizeUser = (user) =>
@@ -62,9 +66,19 @@ module.exports = {
 
     if (status === "OK") {
       const paypalOrderId = verifyData.data.id;
+      const paypalTransactionId = verifyData.data.transactionId;
+      const paypalUser = {
+        name:
+          verifyData.data.payer.name.given_name +
+          " " +
+          verifyData.data.payer.name.surname,
+        email_address: verifyData.data.payer.email_address,
+        payer_id: verifyData.data.payer.payer_id,
+      };
 
       const orderObj = {
         paypal_order_id: paypalOrderId,
+        paypal_transaction_id: paypalTransactionId,
         books: body.bookIds.map((bookId) => {
           return { id: bookId };
         }),
@@ -76,6 +90,7 @@ module.exports = {
             book_id: book.book_id,
           };
         }),
+        paypal_user: paypalUser,
         completed: false,
       };
 
@@ -84,9 +99,61 @@ module.exports = {
         // const entity = await strapi.
         return ctx.send({ message: "CREATED", entity });
       } catch (error) {
+        console.log("error");
         return ctx.badRequest(error);
       }
     } else {
+      return ctx.badRequest("Does not exist");
+    }
+  },
+
+  async processOrderPublic(ctx) {
+    const body = ctx.request.body;
+
+    const verifyData = await verifyPayPalOrderId(body.orderId);
+    const status = verifyData.status;
+
+    if (status === "OK") {
+      const paypalOrderId = verifyData.data.id;
+      const paypalTransactionId = verifyData.data.transactionId;
+      const paypalUser = {
+        name:
+          verifyData.data.payer.name.given_name +
+          " " +
+          verifyData.data.payer.name.surname,
+        email_address: verifyData.data.payer.email_address,
+        payer_id: verifyData.data.payer.payer_id,
+      };
+
+      console.log(JSON.stringify(paypalUser, undefined, 2));
+
+      const orderObj = {
+        paypal_order_id: paypalOrderId,
+        paypal_transaction_id: paypalTransactionId,
+        books: body.bookIds.map((bookId) => {
+          return { id: bookId };
+        }),
+        Book: body.books.map((book) => {
+          return {
+            title: book.title,
+            quantity: book.quantity,
+            book_id: book.book_id,
+          };
+        }),
+        paypal_user: paypalUser,
+        completed: false,
+      };
+
+      try {
+        const entity = await strapi.query("orders").create(orderObj);
+        // const entity = await strapi.
+        return ctx.send({ message: "CREATED", entity });
+      } catch (error) {
+        console.log("error");
+        return ctx.badRequest(error);
+      }
+    } else {
+      console.log("here");
       return ctx.badRequest("Does not exist");
     }
   },
@@ -103,26 +170,93 @@ module.exports = {
     const { body } = ctx.request;
     const { subscriptionId } = body;
 
-    const subscriptionDetails = await verifySubscriptionId(subscriptionId);
+    const { subscription: subscriptionPaypal } = await verifySubscriptionId(
+      subscriptionId
+    );
 
-    if (subscriptionDetails.status) {
+    if (subscriptionPaypal.status) {
       const updatedUser = await strapi.plugins[
         "users-permissions"
       ].services.user.edit(
         { id },
         {
-          subscribed: true,
-          subscription_details: JSON.stringify(subscriptionDetails),
+          isSubscriber: true,
+          subscription_details: JSON.stringify(subscriptionPaypal),
         }
       );
 
       ctx.send({
-        status: subscriptionDetails.status,
-        subscriptionData: subscriptionDetails,
+        status: subscriptionPaypal.status,
+        subscriptionData: subscriptionPaypal,
         updatedUser,
       });
     } else {
-      ctx.send({ error: "NOT_FOUND", body });
+      ctx.badRequest({ error: "NOT_FOUND", body });
+    }
+  },
+
+  async cancelSubscription(ctx) {
+    const { id } = ctx.state.user;
+
+    const user = await strapi.plugins["users-permissions"].services.user.fetch({
+      id,
+    });
+
+    verifyUser(ctx, user);
+
+    const userSubscriptionDetails = JSON.parse(user.subscription_details);
+
+    const subscriptionId = userSubscriptionDetails.id;
+
+    const { subscription: subscriptionPaypal } = await verifySubscriptionId(
+      subscriptionId
+    );
+
+    if (subscriptionPaypal.status) {
+      // if the subscription is already cancelled or inactive
+      if (subscriptionPaypal.status !== "ACTIVE") {
+        const updatedUser = await strapi.plugins[
+          "users-permissions"
+        ].services.user.edit(
+          { id },
+          {
+            isSubscriber: false,
+            subscription_details: JSON.stringify({}),
+          }
+        );
+
+        return ctx.send({
+          message: "Subscription is already cancelled",
+          status: "CANCELLED",
+          updatedUser,
+        });
+      }
+
+      try {
+        const cancelledSubscription = await cancelSubscription(
+          subscriptionPaypal.id,
+          id
+        );
+        console.log(
+          "🚀 ~ file: User.js ~ line 157 ~ cancelSubscription ~ cancelledSubscription",
+          cancelledSubscription
+        );
+
+        ctx.send({
+          subscriptionId,
+          ...subscriptionPaypal,
+          cancelledSubscription,
+        });
+      } catch (error) {
+        console.log(error);
+        ctx.badRequest(error);
+      }
+    } else {
+      console.log("no subpaypal status, sending error");
+      ctx.send({
+        error: subscriptionPaypal.error,
+        ...subscriptionPaypal,
+      });
     }
   },
 

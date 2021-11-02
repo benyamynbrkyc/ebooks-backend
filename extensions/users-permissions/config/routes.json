@@ -445,8 +445,26 @@
         },
         {
             "method": "POST",
+            "path": "/users/processOrder/public",
+            "handler": "User.processOrderPublic",
+            "config": {
+                "policies": [],
+                "prefix": ""
+            }
+        },
+        {
+            "method": "POST",
             "path": "/users/processSubscription",
             "handler": "User.processSubscription",
+            "config": {
+                "policies": [],
+                "prefix": ""
+            }
+        },
+        {
+            "method": "POST",
+            "path": "/users/cancelSubscription",
+            "handler": "User.cancelSubscription",
             "config": {
                 "policies": [],
                 "prefix": ""

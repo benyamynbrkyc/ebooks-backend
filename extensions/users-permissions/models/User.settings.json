@@ -62,7 +62,7 @@
     "owned_books": {
       "collection": "books"
     },
-    "subscribed": {
+    "isSubscriber": {
       "type": "boolean",
       "default": false,
       "required": false,
@@ -78,7 +78,7 @@
       "type": "string",
       "required": false
     },
-    "author": {
+    "isAuthor": {
       "type": "boolean",
       "default": false,
       "required": false
