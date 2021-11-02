@@ -99,7 +99,6 @@ module.exports = {
         const entity = await strapi.query("orders").create(orderObj);
         return ctx.send({ message: "CREATED", entity });
       } catch (error) {
-        console.log(error);
         return ctx.badRequest(error);
       }
     } else {
@@ -147,7 +146,6 @@ module.exports = {
         const entity = await strapi.query("orders").create(orderObj);
         return ctx.send({ message: "CREATED", entity });
       } catch (error) {
-        console.log(error);
         return ctx.badRequest(error);
       }
     } else {
@@ -241,7 +239,6 @@ module.exports = {
           cancelledSubscription,
         });
       } catch (error) {
-        console.log(error);
         ctx.badRequest(error);
       }
     } else {
