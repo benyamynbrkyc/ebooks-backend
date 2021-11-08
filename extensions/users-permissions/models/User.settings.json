@@ -88,6 +88,9 @@
     },
     "subscription_details": {
       "type": "text"
+    },
+    "subscription_id": {
+      "type": "string"
     }
   }
 }

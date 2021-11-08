@@ -125,6 +125,7 @@ const cancelSubscription = async (subscriptionId, userId) => {
       {
         isSubscriber: false,
         subscription_details: JSON.stringify({}),
+        subscription_id: "",
       }
     );
 

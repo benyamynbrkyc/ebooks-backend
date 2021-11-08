@@ -17,6 +17,8 @@ const formatError = (error) => [
   { messages: [{ id: error.id, message: error.message, field: error.field }] },
 ];
 
+const { getBook } = require("./utils/reader.js");
+
 module.exports = {
   async updateMe(ctx) {
     const { id } = ctx.state.user;
@@ -146,6 +148,7 @@ module.exports = {
         const entity = await strapi.query("orders").create(orderObj);
         return ctx.send({ message: "CREATED", entity });
       } catch (error) {
+        console.log(error);
         return ctx.badRequest(error);
       }
     } else {
@@ -154,6 +157,7 @@ module.exports = {
   },
 
   async processSubscription(ctx) {
+    console.log("hit");
     const { id } = ctx.state.user;
 
     const user = await strapi.plugins["users-permissions"].services.user.fetch({
@@ -165,28 +169,40 @@ module.exports = {
     const { body } = ctx.request;
     const { subscriptionId } = body;
 
-    const { subscription: subscriptionPaypal } = await verifySubscriptionId(
-      subscriptionId
-    );
+    console.log("stop 1");
 
-    if (subscriptionPaypal.status) {
-      const updatedUser = await strapi.plugins[
-        "users-permissions"
-      ].services.user.edit(
-        { id },
-        {
-          isSubscriber: true,
-          subscription_details: JSON.stringify(subscriptionPaypal),
-        }
+    try {
+      const { subscription: subscriptionPaypal } = await verifySubscriptionId(
+        subscriptionId
       );
+      console.log("stop 2");
 
-      ctx.send({
-        status: subscriptionPaypal.status,
-        subscriptionData: subscriptionPaypal,
-        updatedUser,
-      });
-    } else {
-      ctx.badRequest({ error: "NOT_FOUND", body });
+      if (subscriptionPaypal.status) {
+        const updatedUser = await strapi.plugins[
+          "users-permissions"
+        ].services.user.edit(
+          { id },
+          {
+            isSubscriber: true,
+            subscription_details: JSON.stringify(subscriptionPaypal),
+            subscription_id: subscriptionPaypal.id,
+          }
+        );
+        console.log("stop 3");
+
+        ctx.send({
+          status: subscriptionPaypal.status,
+          subscriptionData: subscriptionPaypal,
+          updatedUser,
+        });
+      } else {
+        console.log("stop 4");
+        console.log(subscriptionPaypal.status);
+        ctx.badRequest({ error: "NOT_FOUND", body });
+      }
+    } catch (error) {
+      console.log(error);
+      ctx.badRequest(error);
     }
   },
 
@@ -249,6 +265,10 @@ module.exports = {
     }
   },
 
+  async getBook(ctx) {
+    const book = await getBook();
+    ctx.send({ ...book });
+  },
   /**
    * Retrieve authenticated user.
    * @return {Object|Array}

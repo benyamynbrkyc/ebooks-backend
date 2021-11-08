@@ -427,6 +427,15 @@
         },
         {
             "method": "POST",
+            "path": "/users/processSubscription",
+            "handler": "User.processSubscription",
+            "config": {
+                "policies": [],
+                "prefix": ""
+            }
+        },
+        {
+            "method": "POST",
             "path": "/users",
             "handler": "User.create",
             "config": {
@@ -454,8 +463,8 @@
         },
         {
             "method": "POST",
-            "path": "/users/processSubscription",
-            "handler": "User.processSubscription",
+            "path": "/users/cancelSubscription",
+            "handler": "User.cancelSubscription",
             "config": {
                 "policies": [],
                 "prefix": ""
@@ -463,8 +472,8 @@
         },
         {
             "method": "POST",
-            "path": "/users/cancelSubscription",
-            "handler": "User.cancelSubscription",
+            "path": "/users/reader/getBook",
+            "handler": "User.getBook",
             "config": {
                 "policies": [],
                 "prefix": ""
