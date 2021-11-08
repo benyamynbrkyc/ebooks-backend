@@ -1,6 +1,8 @@
 const getBook = async () => {
   return {
-    msg: "hey",
+    data: {
+      msg: "hey",
+    },
   };
 };
 

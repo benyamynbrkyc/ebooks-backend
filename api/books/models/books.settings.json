@@ -51,16 +51,6 @@
       "required": false,
       "default": "N/A"
     },
-    "e_book_preview": {
-      "model": "file",
-      "via": "related",
-      "allowedTypes": [
-        "files"
-      ],
-      "plugin": "upload",
-      "required": false,
-      "pluginOptions": {}
-    },
     "e_book_pdf": {
       "type": "component",
       "repeatable": false,
@@ -73,7 +63,17 @@
     "sponsored": {
       "type": "boolean",
       "default": false,
-      "unique": true
+      "unique": false
+    },
+    "e_book_epub": {
+      "model": "file",
+      "via": "related",
+      "allowedTypes": [
+        "files"
+      ],
+      "plugin": "upload",
+      "required": false,
+      "pluginOptions": {}
     }
   }
 }

@@ -1,5 +1,5 @@
 const _ = require("lodash");
-const { sanitizeEntity } = require("strapi-utils");
+const { sanitizeEntity, escapeQuery } = require("strapi-utils");
 
 const {
   verifyPayPalOrderId,
@@ -266,8 +266,13 @@ module.exports = {
   },
 
   async getBook(ctx) {
-    const book = await getBook();
-    ctx.send({ ...book });
+    const res = await getBook();
+
+    if (res.error)
+      return ctx.send({ message: "An error occurred", error: res.error });
+
+    const { data } = res;
+    ctx.send({ ...data });
   },
   /**
    * Retrieve authenticated user.

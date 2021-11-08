@@ -10,6 +10,14 @@
     },
     {
       "method": "GET",
+      "path": "/books/public",
+      "handler": "books.findPublic",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
       "path": "/books/count",
       "handler": "books.count",
       "config": {
@@ -20,6 +28,14 @@
       "method": "GET",
       "path": "/books/:id",
       "handler": "books.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/books/public/:id",
+      "handler": "books.findOnePublic",
       "config": {
         "policies": []
       }
