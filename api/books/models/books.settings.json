@@ -54,7 +54,8 @@
     "e_book_pdf": {
       "type": "component",
       "repeatable": false,
-      "component": "pdf.full-pdf"
+      "component": "pdf.full-pdf",
+      "required": true
     },
     "in_stock": {
       "type": "integer",
