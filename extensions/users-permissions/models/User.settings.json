@@ -91,6 +91,9 @@
     },
     "subscription_id": {
       "type": "string"
+    },
+    "bookmarks": {
+      "type": "text"
     }
   }
 }

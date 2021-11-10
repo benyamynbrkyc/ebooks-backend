@@ -480,6 +480,24 @@
             }
         },
         {
+            "method": "POST",
+            "path": "/users/reader/setBookmarks",
+            "handler": "User.setBookmarks",
+            "config": {
+                "policies": [],
+                "prefix": ""
+            }
+        },
+        {
+            "method": "GET",
+            "path": "/users/reader/getBookmarks",
+            "handler": "User.getBookmarks",
+            "config": {
+                "policies": [],
+                "prefix": ""
+            }
+        },
+        {
             "method": "PUT",
             "path": "/users/:id",
             "handler": "User.update",

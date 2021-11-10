@@ -18,6 +18,7 @@ const formatError = (error) => [
 ];
 
 const { getBook } = require("./utils/reader.js");
+const { processBookmarks } = require("./utils/bookmarks");
 
 module.exports = {
   async updateMe(ctx) {
@@ -266,13 +267,74 @@ module.exports = {
   },
 
   async getBook(ctx) {
-    const res = await getBook();
+    const { id } = ctx.state.user;
+
+    const user = await strapi.plugins["users-permissions"].services.user.fetch({
+      id,
+    });
+
+    verifyUser(ctx, user);
+
+    const { bookId } = ctx.request.body;
+    const res = await getBook(bookId);
 
     if (res.error)
       return ctx.send({ message: "An error occurred", error: res.error });
 
     const { data } = res;
     ctx.send({ ...data });
+  },
+
+  async getBookmarks(ctx) {
+    const { id } = ctx.state.user;
+
+    const user = await strapi.plugins["users-permissions"].services.user.fetch({
+      id,
+    });
+
+    verifyUser(ctx, user);
+
+    ctx.send({ bookmarks: user.bookmarks });
+  },
+  async setBookmarks(ctx) {
+    const { id } = ctx.state.user;
+
+    const user = await strapi.plugins["users-permissions"].services.user.fetch({
+      id,
+    });
+
+    verifyUser(ctx, user);
+
+    const bookmark = ctx.request.body;
+    let userBookmarks;
+
+    if (
+      user.bookmarks == "" ||
+      user.bookmarks == [] ||
+      Object.keys(JSON.parse(user.bookmarks)).length == 0
+    )
+      userBookmarks = [];
+    else userBookmarks = JSON.parse(user.bookmarks);
+
+    const bookmarks = processBookmarks(bookmark, userBookmarks);
+    console.log(
+      "🚀 ~ file: User.js ~ line 323 ~ setBookmarks ~ bookmarks",
+      bookmarks
+    );
+
+    try {
+      const updatedUser = await strapi.plugins[
+        "users-permissions"
+      ].services.user.edit(
+        { id },
+        {
+          bookmarks: JSON.stringify(bookmarks),
+        }
+      );
+      ctx.send({ bookmarks: JSON.parse(updatedUser.bookmarks) });
+    } catch (error) {
+      ctx.badRequest(`${JSON.stringify(error)}`);
+    }
   },
   /**
    * Retrieve authenticated user.
