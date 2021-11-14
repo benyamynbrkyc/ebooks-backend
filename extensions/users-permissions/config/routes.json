@@ -481,6 +481,15 @@
         },
         {
             "method": "POST",
+            "path": "/users/reader/getBook/public",
+            "handler": "User.getBookPublic",
+            "config": {
+                "policies": [],
+                "prefix": ""
+            }
+        },
+        {
+            "method": "POST",
             "path": "/users/reader/setBookmarks",
             "handler": "User.setBookmarks",
             "config": {

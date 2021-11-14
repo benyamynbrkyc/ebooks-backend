@@ -285,6 +285,17 @@ module.exports = {
     ctx.send({ ...data });
   },
 
+  async getBookPublic(ctx) {
+    const { bookId } = ctx.request.body;
+    const res = await getBook(bookId);
+
+    if (res.error)
+      return ctx.send({ message: "An error occurred", error: res.error });
+
+    const { data } = res;
+    ctx.send({ ...data });
+  },
+
   async getBookmarks(ctx) {
     const { id } = ctx.state.user;
 
