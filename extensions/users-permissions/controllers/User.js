@@ -149,7 +149,6 @@ module.exports = {
         const entity = await strapi.query("orders").create(orderObj);
         return ctx.send({ message: "CREATED", entity });
       } catch (error) {
-        console.log(error);
         return ctx.badRequest(error);
       }
     } else {
@@ -158,7 +157,6 @@ module.exports = {
   },
 
   async processSubscription(ctx) {
-    console.log("hit");
     const { id } = ctx.state.user;
 
     const user = await strapi.plugins["users-permissions"].services.user.fetch({
@@ -170,13 +168,10 @@ module.exports = {
     const { body } = ctx.request;
     const { subscriptionId } = body;
 
-    console.log("stop 1");
-
     try {
       const { subscription: subscriptionPaypal } = await verifySubscriptionId(
         subscriptionId
       );
-      console.log("stop 2");
 
       if (subscriptionPaypal.status) {
         const updatedUser = await strapi.plugins[
@@ -189,7 +184,6 @@ module.exports = {
             subscription_id: subscriptionPaypal.id,
           }
         );
-        console.log("stop 3");
 
         ctx.send({
           status: subscriptionPaypal.status,
@@ -197,12 +191,9 @@ module.exports = {
           updatedUser,
         });
       } else {
-        console.log("stop 4");
-        console.log(subscriptionPaypal.status);
         ctx.badRequest({ error: "NOT_FOUND", body });
       }
     } catch (error) {
-      console.log(error);
       ctx.badRequest(error);
     }
   },
@@ -328,10 +319,6 @@ module.exports = {
     else userBookmarks = JSON.parse(user.bookmarks);
 
     const bookmarks = processBookmarks(bookmark, userBookmarks);
-    console.log(
-      "🚀 ~ file: User.js ~ line 323 ~ setBookmarks ~ bookmarks",
-      bookmarks
-    );
 
     try {
       const updatedUser = await strapi.plugins[

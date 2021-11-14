@@ -14,15 +14,12 @@ async function download(url, dest) {
     })
       .pipe(file)
       .on("finish", async () => {
-        console.log(`The file is finished downloading.`);
         resolve();
       })
       .on("error", (error) => {
         reject(error);
       });
-  }).catch((error) => {
-    console.log(`Something happened: ${error}`);
-  });
+  }).catch((error) => {});
 }
 
 module.exports = {

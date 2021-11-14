@@ -7,9 +7,6 @@ const ebookConverter = require("node-ebook-converter");
 module.exports = {
   lifecycles: {
     async afterCreate(result, data) {
-      console.log("**** created book");
-      console.log(result);
-
       return;
       const eBookPdfUrl = process.cwd() + "/public" + result.e_book_pdf.PDF.url;
 
@@ -23,7 +20,6 @@ module.exports = {
             ".epub",
           authors: result.author,
         });
-        console.log(response);
       } catch (error) {
         console.error(error);
         throw new Error("Could not convert");
