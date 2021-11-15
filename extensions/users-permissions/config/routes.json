@@ -507,6 +507,15 @@
             }
         },
         {
+            "method": "POST",
+            "path": "/users/addToLibrary/:id",
+            "handler": "User.addToLibrary",
+            "config": {
+                "policies": [],
+                "prefix": ""
+            }
+        },
+        {
             "method": "PUT",
             "path": "/users/:id",
             "handler": "User.update",

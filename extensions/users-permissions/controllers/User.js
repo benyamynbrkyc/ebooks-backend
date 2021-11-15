@@ -334,6 +334,44 @@ module.exports = {
       ctx.badRequest(`${JSON.stringify(error)}`);
     }
   },
+
+  async addToLibrary(ctx) {
+    const { id } = ctx.state.user;
+
+    const user = await strapi.plugins["users-permissions"].services.user.fetch({
+      id,
+    });
+
+    verifyUser(ctx, user);
+
+    const { bookId } = ctx.request.body;
+
+    console.log(bookId);
+
+    const entity = await strapi.services.books.findOne({ id: bookId });
+    const book = sanitizeEntity(entity, { model: strapi.models.books });
+
+    const userLibrary = user.books_in_library;
+
+    if (book.sponsored) {
+      const updatedUser = await strapi.plugins[
+        "users-permissions"
+      ].services.user.edit(
+        { id },
+        {
+          books_in_library: [...userLibrary, { id: book.id }],
+        }
+      );
+      ctx.send({
+        library: updatedUser.books_in_library,
+        status: "OK",
+      });
+    } else if (!book.sponsored && !user.subscriber) {
+      return ctx.badRequest();
+    }
+
+    // if (book.sponsored)
+  },
   /**
    * Retrieve authenticated user.
    * @return {Object|Array}
