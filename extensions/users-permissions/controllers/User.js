@@ -295,8 +295,7 @@ module.exports = {
     });
 
     verifyUser(ctx, user);
-
-    ctx.send({ bookmarks: user.bookmarks });
+    ctx.send({ bookmarks: JSON.parse(user.bookmarks) });
   },
   async setBookmarks(ctx) {
     const { id } = ctx.state.user;
@@ -371,6 +370,32 @@ module.exports = {
     }
 
     // if (book.sponsored)
+  },
+
+  async removeFromLibrary(ctx) {
+    const { id } = ctx.state.user;
+
+    const user = await strapi.plugins["users-permissions"].services.user.fetch({
+      id,
+    });
+    verifyUser(ctx, user);
+
+    const { bookId } = ctx.request.body;
+
+    const filteredBooks = user.books_in_library.filter(
+      (book) => book.id !== bookId
+    );
+
+    const updatedUser = await strapi.plugins[
+      "users-permissions"
+    ].services.user.edit(
+      { id },
+      {
+        books_in_library: [...filteredBooks],
+      }
+    );
+
+    ctx.send({ library: updatedUser.books_in_library, status: "OK" });
   },
   /**
    * Retrieve authenticated user.

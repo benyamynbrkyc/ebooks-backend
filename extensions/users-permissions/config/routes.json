@@ -498,6 +498,15 @@
             }
         },
         {
+            "method": "POST",
+            "path": "/users/reader/removeFromLibrary/:id",
+            "handler": "User.removeFromLibrary",
+            "config": {
+                "policies": [],
+                "prefix": ""
+            }
+        },
+        {
             "method": "GET",
             "path": "/users/reader/getBookmarks",
             "handler": "User.getBookmarks",
