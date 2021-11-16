@@ -94,6 +94,10 @@
     },
     "bookmarks": {
       "type": "text"
+    },
+    "has_submitted_author_request": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

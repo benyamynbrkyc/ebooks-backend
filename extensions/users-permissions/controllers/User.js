@@ -397,6 +397,29 @@ module.exports = {
 
     ctx.send({ library: updatedUser.books_in_library, status: "OK" });
   },
+  async submitRequestToBecomeAuthor(ctx) {
+    const { id } = ctx.state.user;
+
+    const user = await strapi.plugins["users-permissions"].services.user.fetch({
+      id,
+    });
+    verifyUser(ctx, user);
+
+    try {
+      const updatedUser = await strapi.plugins[
+        "users-permissions"
+      ].services.user.edit(
+        { id },
+        {
+          has_submitted_author_request: true,
+        }
+      );
+
+      ctx.send({ updatedUser, status: "OK" });
+    } catch (error) {
+      ctx.badRequest("Could not update user.");
+    }
+  },
   /**
    * Retrieve authenticated user.
    * @return {Object|Array}

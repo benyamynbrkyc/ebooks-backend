@@ -507,6 +507,15 @@
             }
         },
         {
+            "method": "POST",
+            "path": "/users/author/submitRequestToBecomeAuthor/",
+            "handler": "User.submitRequestToBecomeAuthor",
+            "config": {
+                "policies": [],
+                "prefix": ""
+            }
+        },
+        {
             "method": "GET",
             "path": "/users/reader/getBookmarks",
             "handler": "User.getBookmarks",
