@@ -19,6 +19,7 @@ const formatError = (error) => [
 
 const { getBook } = require("./utils/reader.js");
 const { processBookmarks } = require("./utils/bookmarks");
+const { compileData } = require("./utils/dashboard");
 
 module.exports = {
   async updateMe(ctx) {
@@ -429,7 +430,9 @@ module.exports = {
     });
     verifyUser(ctx, user);
 
-    ctx.send({ status: "ok" });
+    const data = await compileData(user);
+
+    ctx.send(data);
   },
   /**
    * Retrieve authenticated user.
