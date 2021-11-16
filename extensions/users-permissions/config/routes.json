@@ -525,6 +525,15 @@
             }
         },
         {
+            "method": "POST",
+            "path": "/users/author/submitNewBook",
+            "handler": "User.submitNewBook",
+            "config": {
+                "policies": [],
+                "prefix": ""
+            }
+        },
+        {
             "method": "GET",
             "path": "/users/reader/getBookmarks",
             "handler": "User.getBookmarks",

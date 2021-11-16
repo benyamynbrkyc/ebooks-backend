@@ -51,12 +51,6 @@
       "required": false,
       "default": "N/A"
     },
-    "e_book_pdf": {
-      "type": "component",
-      "repeatable": false,
-      "component": "pdf.full-pdf",
-      "required": true
-    },
     "in_stock": {
       "type": "integer",
       "default": 50
@@ -75,6 +69,20 @@
       "plugin": "upload",
       "required": false,
       "pluginOptions": {}
+    },
+    "e_book_pdf": {
+      "model": "file",
+      "via": "related",
+      "allowedTypes": [
+        "files"
+      ],
+      "plugin": "upload",
+      "required": false,
+      "pluginOptions": {}
+    },
+    "authored_by": {
+      "plugin": "users-permissions",
+      "model": "user"
     }
   }
 }

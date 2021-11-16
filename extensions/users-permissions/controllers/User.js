@@ -434,6 +434,37 @@ module.exports = {
 
     ctx.send(data);
   },
+
+  async submitNewBook(ctx) {
+    const { id } = ctx.state.user;
+
+    const user = await strapi.plugins["users-permissions"].services.user.fetch({
+      id,
+    });
+    verifyUser(ctx, user);
+
+    const body = ctx.request.body;
+    console.log(body);
+
+    const book = {
+      title: body.title.charAt(0).toUpperCase() + body.title.slice(1),
+      author: user.first_name + " " + user.last_name,
+      description: body.description,
+      price: parseFloat(Number(body.price).toFixed(2)),
+      cover: { id: body.coverId },
+      e_book_pdf: { id: body.pdfId },
+      authored_by: { id: user.id },
+      published_at: null,
+    };
+
+    try {
+      const createdBook = await strapi.services.books.create(book);
+
+      ctx.send(createdBook);
+    } catch (error) {
+      throw error;
+    }
+  },
   /**
    * Retrieve authenticated user.
    * @return {Object|Array}
