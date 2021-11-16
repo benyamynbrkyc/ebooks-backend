@@ -516,6 +516,15 @@
             }
         },
         {
+            "method": "POST",
+            "path": "/users/author/getData/all",
+            "handler": "User.getDataAll",
+            "config": {
+                "policies": [],
+                "prefix": ""
+            }
+        },
+        {
             "method": "GET",
             "path": "/users/reader/getBookmarks",
             "handler": "User.getBookmarks",

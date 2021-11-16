@@ -420,6 +420,17 @@ module.exports = {
       ctx.badRequest("Could not update user.");
     }
   },
+
+  async getDataAll(ctx) {
+    const { id } = ctx.state.user;
+
+    const user = await strapi.plugins["users-permissions"].services.user.fetch({
+      id,
+    });
+    verifyUser(ctx, user);
+
+    ctx.send({ status: "ok" });
+  },
   /**
    * Retrieve authenticated user.
    * @return {Object|Array}
