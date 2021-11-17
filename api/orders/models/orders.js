@@ -24,7 +24,7 @@ module.exports = {
 
           const newBooksIds = data.Book.filter(
             (book) => book.edition === "ebook"
-          ).map((book) => book.book_id);
+          ).map((book) => Number(book.book_id.toString().replace(/\D/g, "")));
 
           let owned_books = [...userAlreadyOwnedBooksIds, ...newBooksIds];
 

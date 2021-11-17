@@ -24,6 +24,10 @@
     },
     "edition": {
       "type": "string"
+    },
+    "ebook": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

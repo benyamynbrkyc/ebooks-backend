@@ -79,7 +79,6 @@ module.exports = {
         email_address: verifyData.data.payer.email_address,
         payer_id: verifyData.data.payer.payer_id,
       };
-
       const orderObj = {
         paypal_order_id: paypalOrderId,
         paypal_transaction_id: paypalTransactionId,
@@ -91,8 +90,9 @@ module.exports = {
           return {
             title: book.title,
             quantity: book.quantity,
-            book_id: book.book_id,
+            book_id: Number(book.book_id.toString().replace(/\D/g, "")),
             edition: book.edition,
+            ebook: book.edition == "ebook",
           };
         }),
         paypal_user: paypalUser,
