@@ -2,6 +2,14 @@
 // total amount earned
 // get all orders with his book and reduce to object with: {name, totalquantity, price of 1}
 
+const {
+  isInArray,
+  merge,
+  updateItemInfoInArr,
+  getEarned,
+  getIndividual,
+} = require("./utils");
+
 /*
 data for individual author:
 {
@@ -44,7 +52,6 @@ const sanitizeOrder = (order, authorId) => {
     books: sanitizedOrder.books.map((b) => sanitizeBook(b)),
   };
 
-  console.log("sanitizedOrder", sanitizedOrder);
   return sanitizedOrder;
 };
 
@@ -78,7 +85,7 @@ const getOrdersForAuthor = async (authorId) => {
         return sanitizeOrder(order, authorId);
       }
     })
-    .filter((o) => o); // quickly return non-null/undefined values
+    .filter((o) => o); // quickly return non-null/non-undefined values
 
   return { authorOrders, count: authorOrders.length };
 };
@@ -89,7 +96,12 @@ const getBookDataForOrder = (booksOrdered, booksInfo) => {
   // array of objects representing each order with quantity, name, total price, id
   let sold = [];
   let soldEbooks = [];
-  let soldPrint = [];
+  let soldPrints = [];
+  let individual = {
+    totalIndividualBooksSold: 0,
+    totalIndividualEbooksSold: 0,
+    totalIndividualPrintsSold: 0,
+  };
 
   booksOrdered.forEach((bookOrder) => {
     booksInfo.forEach((b) => {
@@ -106,12 +118,16 @@ const getBookDataForOrder = (booksOrdered, booksInfo) => {
           published_at: bookOrder.published_at,
         };
 
-        console.log(bookOrder);
-
-        if (bookOrder.edition == "print") soldPrint.push(item);
-        else if (bookOrder.edition == "ebook") soldEbooks.push(item);
+        if (bookOrder.edition == "print") {
+          soldPrints.push(item);
+          individual.totalIndividualPrintsSold += item.quantity;
+        } else if (bookOrder.edition == "ebook") {
+          soldEbooks.push(item);
+          individual.totalIndividualEbooksSold += item.quantity;
+        }
 
         sold.push(item);
+        individual.totalIndividualBooksSold += item.quantity;
       }
     });
   });
@@ -121,30 +137,118 @@ const getBookDataForOrder = (booksOrdered, booksInfo) => {
     0
   );
 
+  const totalEarnedEbooks = soldEbooks.reduce(
+    (total, current) => total + current.priceTotal,
+    0
+  );
+  const totalEarnedPrints = soldPrints.reduce(
+    (total, current) => total + current.priceTotal,
+    0
+  );
+
   return {
     sales: {
-      sold,
-      soldEbooks,
-      soldPrint,
+      items: {
+        sold,
+        soldEbooks,
+        soldPrints,
+      },
+      individual,
+      earned: {
+        totalEarned,
+        totalEarnedEbooks,
+        totalEarnedPrints,
+      },
     },
-    totalEarned,
-    totalIndividualBooksSold: sold.length,
   };
 };
 
 const getBookData = (orders) => {
-  let sold = [];
   let soldEbooks = [];
-  let soldPrint = [];
+  let soldPrints = [];
 
   const ordersSummary = orders.map((order) =>
     getBookDataForOrder(order.Book, order.books)
   );
 
+  ordersSummary.forEach((order) => {
+    // Ebooks handler
+    order.sales.items.soldEbooks.forEach((book) => {
+      delete book.orderId;
+      delete book.edition;
+      // TODO: remove
+      delete book.cover;
+
+      if (!isInArray(soldEbooks, book.book_id)) {
+        soldEbooks.push(book);
+      } else {
+        const existingItemIdx = soldEbooks.findIndex(
+          (b) => b.book_id == book.book_id
+        );
+        const existingItem = soldEbooks.find((b) => b.book_id == book.book_id);
+
+        const updatedItem = {
+          ...existingItem,
+          quantity: existingItem.quantity + book.quantity,
+          priceTotal:
+            existingItem.priceByOne * (existingItem.quantity + book.quantity),
+        };
+
+        soldEbooks[existingItemIdx] = updatedItem;
+      }
+    });
+
+    // Prints handler
+    order.sales.items.soldPrints.forEach((book) => {
+      delete book.orderId;
+      delete book.edition;
+      // TODO: remove
+      delete book.cover;
+
+      if (!isInArray(soldPrints, book.book_id)) {
+        soldPrints.push(book);
+      } else {
+        const existingItemIdx = soldPrints.findIndex(
+          (b) => b.book_id == book.book_id
+        );
+        const existingItem = soldPrints.find((b) => b.book_id == book.book_id);
+        let q = existingItem.quantity;
+
+        const updatedItem = {
+          ...existingItem,
+          quantity: existingItem.quantity + book.quantity,
+          priceTotal:
+            existingItem.priceByOne * (existingItem.quantity + book.quantity),
+        };
+
+        soldPrints[existingItemIdx] = updatedItem;
+      }
+    });
+  });
+
+  // console.log(1);
+  // console.log(soldPrints);
+
+  console.log(1);
+  console.log(soldEbooks);
+
+  let sold = merge(soldEbooks, soldPrints, "book_id");
+
+  const earned = { ...getEarned(sold, soldEbooks, soldPrints) };
+  const individual = { ...getIndividual(sold, soldEbooks, soldPrints) };
+
+  console.log(2);
+  console.log(soldEbooks);
+
+  const items = { ...updateItemInfoInArr(sold, soldEbooks, soldPrints) };
+
+  // console.log(2);
+  // console.log(soldPrints);
+
   return {
-    sold,
-    soldEbooks,
-    soldPrint,
+    items,
+    earned,
+    individual,
     ordersSummary,
   };
 };
@@ -152,12 +256,11 @@ const getBookData = (orders) => {
 const compileData = async (user) => {
   const { id: authorId } = user;
   const { authorOrders } = await getOrdersForAuthor(authorId);
-  const books = getBookData(authorOrders);
+  const bookData = getBookData(authorOrders);
 
   const data = {
     authorId,
-    authorOrders,
-    books,
+    bookData,
   };
 
   return data;
