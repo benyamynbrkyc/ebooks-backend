@@ -35,23 +35,29 @@ const sanitizeOrder = (order, authorId) => {
     (b) => b.authored_by == authorId
   );
 
+  sanitizedOrder.Book.forEach(
+    (book) => (book.published_at = order.published_at)
+  );
+
   sanitizedOrder = {
     ...sanitizedOrder,
     books: sanitizedOrder.books.map((b) => sanitizeBook(b)),
   };
 
-  console.log("order object", sanitizedOrder);
+  console.log("sanitizedOrder", sanitizedOrder);
   return sanitizedOrder;
 };
 
 const sanitizeBook = (book) => {
   const sanitizedBook = { ...book };
+
   delete sanitizedBook.in_stock;
   delete sanitizedBook.sponsored;
   delete sanitizedBook.created_by;
   delete sanitizedBook.updated_by;
   delete sanitizedBook.created_at;
   delete sanitizedBook.updated_at;
+
   return sanitizedBook;
 };
 
@@ -65,27 +71,93 @@ const getOrdersForAuthor = async (authorId) => {
 
   const allOrders = await strapi.services.orders.find({});
 
-  const ordersRelatedToAuthor = allOrders
+  const authorOrders = allOrders
     .map((order) => {
       const foundBook = order.Book.find((b) => bookIds.includes(b.book_id));
       if (foundBook) {
         return sanitizeOrder(order, authorId);
       }
     })
-    .filter((o) => o);
+    .filter((o) => o); // quickly return non-null/undefined values
 
-  return { ordersRelatedToAuthor, count: ordersRelatedToAuthor.length };
+  return { authorOrders, count: authorOrders.length };
+};
+
+// booksOrdered - array of books in the order object
+// booksInfo -    array of full book objects related to the ordered books
+const getBookDataForOrder = (booksOrdered, booksInfo) => {
+  // array of objects representing each order with quantity, name, total price, id
+  let sold = [];
+  let soldEbooks = [];
+  let soldPrint = [];
+
+  booksOrdered.forEach((bookOrder) => {
+    booksInfo.forEach((b) => {
+      if (b.id == bookOrder.book_id) {
+        const item = {
+          orderId: bookOrder.id,
+          book_id: b.id,
+          title: bookOrder.title,
+          quantity: bookOrder.quantity,
+          edition: bookOrder.edition,
+          priceByOne: b.price,
+          priceTotal: Number(b.price) * Number(bookOrder.quantity),
+          cover: b.cover,
+          published_at: bookOrder.published_at,
+        };
+
+        console.log(bookOrder);
+
+        if (bookOrder.edition == "print") soldPrint.push(item);
+        else if (bookOrder.edition == "ebook") soldEbooks.push(item);
+
+        sold.push(item);
+      }
+    });
+  });
+
+  const totalEarned = sold.reduce(
+    (total, current) => total + current.priceTotal,
+    0
+  );
+
+  return {
+    sales: {
+      sold,
+      soldEbooks,
+      soldPrint,
+    },
+    totalEarned,
+    totalIndividualBooksSold: sold.length,
+  };
+};
+
+const getBookData = (orders) => {
+  let sold = [];
+  let soldEbooks = [];
+  let soldPrint = [];
+
+  const ordersSummary = orders.map((order) =>
+    getBookDataForOrder(order.Book, order.books)
+  );
+
+  return {
+    sold,
+    soldEbooks,
+    soldPrint,
+    ordersSummary,
+  };
 };
 
 const compileData = async (user) => {
   const { id: authorId } = user;
-  return await getOrdersForAuthor(authorId);
+  const { authorOrders } = await getOrdersForAuthor(authorId);
+  const books = getBookData(authorOrders);
 
   const data = {
-    msg: "hey",
-    name: user.first_name,
     authorId,
-    user,
+    authorOrders,
+    books,
   };
 
   return data;
