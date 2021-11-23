@@ -220,11 +220,9 @@ const getBookData = (orders) => {
 
 const compileData = async (user) => {
   const { id: authorId } = user;
-  const {
-    authorOrders,
-    authorBooks: books,
-    count,
-  } = await getOrdersForAuthor(authorId);
+  const { authorOrders, authorBooks: books } = await getOrdersForAuthor(
+    authorId
+  );
   const bookData = getBookData(authorOrders);
 
   const data = {
@@ -232,7 +230,6 @@ const compileData = async (user) => {
     bookData,
     authorBooks: {
       books,
-      count,
     },
   };
 
