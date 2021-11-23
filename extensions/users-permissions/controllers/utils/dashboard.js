@@ -1,7 +1,3 @@
-// num of orders
-// total amount earned
-// get all orders with his book and reduce to object with: {name, totalquantity, price of 1}
-
 const {
   isInArray,
   merge,
@@ -9,23 +5,6 @@ const {
   getEarned,
   getIndividual,
 } = require("./utils");
-
-/*
-data for individual author:
-{
-    name,
-    totalEarned,
-    orders: {
-        sanitize an order object to only include the book of the author
-    },
-    books: {
-        whichBooksSoldHowMuch: [orderObject contains quantity, store when order created, use with name to build object, id, fetch author name, check if his],
-        numOfTotalIndividualBooksSold: [calculate using whichBooksSoldHowMuch]
-        bookArray: [fetch from /books using ids, store the complete bookObject here, delete files]
-    },
-
-}
-*/
 
 const sanitizeOrder = (order, authorId) => {
   let sanitizedOrder = { ...order };
@@ -87,7 +66,7 @@ const getOrdersForAuthor = async (authorId) => {
     })
     .filter((o) => o); // quickly return non-null/non-undefined values
 
-  return { authorOrders, count: authorOrders.length };
+  return { authorOrders, count: authorOrders.length, authorBooks };
 };
 
 // booksOrdered - array of books in the order object
@@ -202,8 +181,6 @@ const getBookData = (orders) => {
     order.sales.items.soldPrints.forEach((book) => {
       delete book.orderId;
       delete book.edition;
-      // TODO: remove
-      delete book.cover;
 
       if (!isInArray(soldPrints, book.book_id)) {
         soldPrints.push(book);
@@ -226,24 +203,12 @@ const getBookData = (orders) => {
     });
   });
 
-  // console.log(1);
-  // console.log(soldPrints);
-
-  console.log(1);
-  console.log(soldEbooks);
-
   let sold = merge(soldEbooks, soldPrints, "book_id");
 
   const earned = { ...getEarned(sold, soldEbooks, soldPrints) };
   const individual = { ...getIndividual(sold, soldEbooks, soldPrints) };
 
-  console.log(2);
-  console.log(soldEbooks);
-
   const items = { ...updateItemInfoInArr(sold, soldEbooks, soldPrints) };
-
-  // console.log(2);
-  // console.log(soldPrints);
 
   return {
     items,
@@ -255,12 +220,20 @@ const getBookData = (orders) => {
 
 const compileData = async (user) => {
   const { id: authorId } = user;
-  const { authorOrders } = await getOrdersForAuthor(authorId);
+  const {
+    authorOrders,
+    authorBooks: books,
+    count,
+  } = await getOrdersForAuthor(authorId);
   const bookData = getBookData(authorOrders);
 
   const data = {
     authorId,
     bookData,
+    authorBooks: {
+      books,
+      count,
+    },
   };
 
   return data;
