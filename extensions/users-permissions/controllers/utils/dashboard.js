@@ -154,9 +154,6 @@ const getBookData = (orders) => {
     // Ebooks handler
     order.sales.items.soldEbooks.forEach((book) => {
       delete book.orderId;
-      delete book.edition;
-      // TODO: remove
-      delete book.cover;
 
       if (!isInArray(soldEbooks, book.book_id)) {
         soldEbooks.push(book);
@@ -180,7 +177,6 @@ const getBookData = (orders) => {
     // Prints handler
     order.sales.items.soldPrints.forEach((book) => {
       delete book.orderId;
-      delete book.edition;
 
       if (!isInArray(soldPrints, book.book_id)) {
         soldPrints.push(book);
