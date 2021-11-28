@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_homepage_quotes",
+  "info": {
+    "name": "quotes",
+    "icon": "align-center"
+  },
+  "options": {},
+  "attributes": {
+    "quote": {
+      "type": "text",
+      "required": true
+    },
+    "source": {
+      "type": "string",
+      "required": true
+    },
+    "source_link": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "collectionName": "components_homepage_autors",
+  "info": {
+    "name": "Author",
+    "icon": "user-circle",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "full_name": {
+      "type": "string",
+      "required": true
+    },
+    "desc_short": {
+      "type": "string"
+    },
+    "image": {
+      "model": "file",
+      "via": "related",
+      "allowedTypes": [
+        "images"
+      ],
+      "plugin": "upload",
+      "required": true,
+      "pluginOptions": {}
+    },
+    "desc_long": {
+      "type": "text",
+      "required": true
+    }
+  }
+}

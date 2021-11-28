@@ -1,0 +1,25 @@
+{
+  "kind": "singleType",
+  "collectionName": "homepages",
+  "info": {
+    "name": "Homepage",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "Author": {
+      "type": "component",
+      "repeatable": false,
+      "component": "homepage.autor"
+    },
+    "Quotes": {
+      "type": "component",
+      "repeatable": true,
+      "component": "homepage.quotes"
+    }
+  }
+}
