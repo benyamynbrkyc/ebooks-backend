@@ -20,6 +20,12 @@
       "type": "component",
       "repeatable": true,
       "component": "homepage.quotes"
+    },
+    "HeroSlides": {
+      "type": "component",
+      "repeatable": true,
+      "component": "homepage.hero-slides",
+      "required": true
     }
   }
 }

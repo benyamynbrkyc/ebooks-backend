@@ -470,9 +470,8 @@ module.exports = {
    * @return {Object|Array}
    */
   async me(ctx) {
-    const { id } = ctx.state.user.id;
     let data = await strapi.plugins["users-permissions"].services.user.fetch({
-      id,
+      id: ctx.state.user.id,
     });
 
     if (data) {
