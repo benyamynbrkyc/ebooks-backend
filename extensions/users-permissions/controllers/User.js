@@ -303,6 +303,7 @@ module.exports = {
     });
 
     verifyUser(ctx, user);
+    console.log(user.bookmarks);
     ctx.send({ bookmarks: JSON.parse(user.bookmarks) });
   },
   async setBookmarks(ctx) {
@@ -318,6 +319,7 @@ module.exports = {
     let userBookmarks;
 
     if (
+      user.bookmarks == null ||
       user.bookmarks == "" ||
       user.bookmarks == [] ||
       Object.keys(JSON.parse(user.bookmarks)).length == 0
