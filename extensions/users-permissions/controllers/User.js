@@ -183,6 +183,9 @@ module.exports = {
             isSubscriber: true,
             subscription_details: JSON.stringify(subscriptionPaypal),
             subscription_id: subscriptionPaypal.id,
+            role: {
+              id: 3,
+            },
           }
         );
 
@@ -226,6 +229,9 @@ module.exports = {
           {
             isSubscriber: false,
             subscription_details: JSON.stringify({}),
+            role: {
+              id: 1,
+            },
           }
         );
 
@@ -259,6 +265,7 @@ module.exports = {
   },
 
   async getBook(ctx) {
+    console.log("here");
     const { id } = ctx.state.user;
 
     const user = await strapi.plugins["users-permissions"].services.user.fetch({
@@ -465,10 +472,41 @@ module.exports = {
       throw error;
     }
   },
+
+  async setLastPages(ctx) {
+    const { id } = ctx.state.user;
+
+    const user = await strapi.plugins["users-permissions"].services.user.fetch({
+      id,
+    });
+    verifyUser(ctx, user);
+
+    const { dataString } = ctx.request.body;
+    const pages = JSON.parse(dataString);
+
+    try {
+      const updatedUser = await strapi.plugins[
+        "users-permissions"
+      ].services.user.edit(
+        { id },
+        {
+          last_pages: [...pages],
+        }
+      );
+      ctx.send({
+        updatedUser,
+        status: "OK",
+      });
+    } catch (error) {
+      throw error;
+    }
+  },
+
   /**
    * Retrieve authenticated user.
    * @return {Object|Array}
    */
+
   async me(ctx) {
     let data = await strapi.plugins["users-permissions"].services.user.fetch({
       id: ctx.state.user.id,

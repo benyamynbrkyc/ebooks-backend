@@ -499,6 +499,15 @@
         },
         {
             "method": "POST",
+            "path": "/users/reader/setLastPages",
+            "handler": "User.setLastPages",
+            "config": {
+                "policies": [],
+                "prefix": ""
+            }
+        },
+        {
+            "method": "POST",
             "path": "/users/reader/removeFromLibrary/:id",
             "handler": "User.removeFromLibrary",
             "config": {
