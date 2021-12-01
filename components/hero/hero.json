@@ -1,9 +1,8 @@
 {
-  "collectionName": "components_homepage_hero_slides",
+  "collectionName": "components_hero_heroes",
   "info": {
-    "name": "HeroSlides",
-    "icon": "images",
-    "description": ""
+    "name": "Hero",
+    "icon": "pager"
   },
   "options": {},
   "attributes": {
@@ -24,17 +23,6 @@
       "plugin": "upload",
       "required": true,
       "pluginOptions": {}
-    },
-    "link": {
-      "type": "enumeration",
-      "enum": [
-        "contact",
-        "shop",
-        "about",
-        "register"
-      ],
-      "default": "shop",
-      "required": true
     }
   }
 }

@@ -453,15 +453,15 @@ module.exports = {
     verifyUser(ctx, user);
 
     const body = ctx.request.body;
-    console.log(body);
 
     const book = {
       title: body.title.charAt(0).toUpperCase() + body.title.slice(1),
       author: user.first_name + " " + user.last_name,
+      publisher: body.publisher,
       description: body.description,
       price: parseFloat(Number(body.price).toFixed(2)),
       cover: { id: body.coverId },
-      e_book_pdf: { id: body.pdfId },
+      e_book_epub: { id: body.epubId },
       authored_by: { id: user.id },
       published_at: null,
     };

@@ -83,6 +83,9 @@
     "authored_by": {
       "plugin": "users-permissions",
       "model": "user"
+    },
+    "publisher": {
+      "type": "string"
     }
   }
 }

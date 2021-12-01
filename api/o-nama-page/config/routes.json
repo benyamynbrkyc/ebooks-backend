@@ -1,0 +1,28 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/o-nama-page",
+      "handler": "o-nama-page.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/o-nama-page",
+      "handler": "o-nama-page.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/o-nama-page",
+      "handler": "o-nama-page.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}

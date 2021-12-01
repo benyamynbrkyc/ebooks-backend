@@ -1,0 +1,26 @@
+{
+  "kind": "singleType",
+  "collectionName": "o_nama_pages",
+  "info": {
+    "name": "O Nama page",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "Hero": {
+      "type": "component",
+      "repeatable": false,
+      "component": "hero.hero"
+    },
+    "Text": {
+      "type": "component",
+      "repeatable": false,
+      "component": "text.text",
+      "required": true
+    }
+  }
+}
