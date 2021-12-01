@@ -483,8 +483,8 @@ module.exports = {
     });
     verifyUser(ctx, user);
 
-    const { dataString } = ctx.request.body;
-    const pages = JSON.parse(dataString);
+    const { pages } = ctx.request.body;
+    const _pages = JSON.parse(pages);
 
     try {
       const updatedUser = await strapi.plugins[
@@ -492,7 +492,7 @@ module.exports = {
       ].services.user.edit(
         { id },
         {
-          last_pages: [...pages],
+          last_pages: [..._pages],
         }
       );
       ctx.send({
