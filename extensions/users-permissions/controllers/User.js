@@ -232,6 +232,7 @@ module.exports = {
             role: {
               id: 1,
             },
+            books_in_library: [],
           }
         );
 
