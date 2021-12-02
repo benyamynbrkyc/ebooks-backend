@@ -126,6 +126,10 @@ const cancelSubscription = async (subscriptionId, userId) => {
         isSubscriber: false,
         subscription_details: JSON.stringify({}),
         subscription_id: "",
+        role: {
+          id: 1,
+        },
+        books_in_library: [],
       }
     );
 
