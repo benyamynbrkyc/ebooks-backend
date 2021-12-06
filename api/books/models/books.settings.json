@@ -90,6 +90,9 @@
     "is_on_sale": {
       "type": "boolean",
       "default": false
+    },
+    "price_original": {
+      "type": "decimal"
     }
   }
 }

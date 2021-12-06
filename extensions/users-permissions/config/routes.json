@@ -576,6 +576,15 @@
             }
         },
         {
+            "method": "POST",
+            "path": "/users/editBook",
+            "handler": "User.editBook",
+            "config": {
+                "policies": [],
+                "prefix": ""
+            }
+        },
+        {
             "method": "DELETE",
             "path": "/users/:id",
             "handler": "User.destroy",

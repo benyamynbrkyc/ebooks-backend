@@ -505,6 +505,44 @@ module.exports = {
     }
   },
 
+  async editBook(ctx) {
+    const { id } = ctx.state.user;
+
+    const user = await strapi.plugins["users-permissions"].services.user.fetch({
+      id,
+    });
+    verifyUser(ctx, user);
+
+    const { id: bookId, ...bookData } = ctx.request.body;
+
+    const book = await strapi.services.books.findOne({ id: bookId });
+
+    if (book.authored_by.id !== id) {
+      return ctx.throw(401, "access_denied", { user: user });
+    }
+
+    if (!book.price_original) {
+      book.price_original = book.price;
+    }
+
+    let priceChange = book.price;
+    if (bookData.is_on_sale) {
+      priceChange = bookData.price_on_sale;
+    } else {
+      priceChange = bookData.price_original;
+    }
+
+    const updatedBook = await strapi
+      .query("books")
+      .update({ id: bookId }, { ...bookData, price: priceChange });
+
+    ctx.send({
+      status: "OK",
+      message: "Book updated successfully",
+      updatedBook,
+    });
+  },
+
   /**
    * Retrieve authenticated user.
    * @return {Object|Array}
