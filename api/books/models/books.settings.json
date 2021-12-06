@@ -86,6 +86,10 @@
     },
     "publisher": {
       "type": "string"
+    },
+    "is_on_sale": {
+      "type": "boolean",
+      "default": false
     }
   }
 }
