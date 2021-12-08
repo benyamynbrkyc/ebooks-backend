@@ -280,13 +280,17 @@ module.exports = {
     verifyUser(ctx, user);
 
     const { bookId } = ctx.request.body;
-    const res = await getBook(bookId);
 
-    if (res.error)
-      return ctx.send({ message: "An error occurred", error: res.error });
+    try {
+      const res = await getBook(bookId);
+      if (res.error)
+        return ctx.send({ message: "An error occurred", error: res.error });
 
-    const { data } = res;
-    ctx.send({ ...data });
+      const { data } = res;
+      ctx.send({ ...data });
+    } catch (error) {
+      ctx.badRequest(error);
+    }
   },
 
   async getBookPublic(ctx) {

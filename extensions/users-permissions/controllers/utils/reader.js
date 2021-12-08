@@ -14,7 +14,7 @@ const getBook = async (id) => {
     };
   } catch (error) {
     console.error(error);
-    return {
+    throw {
       error,
     };
   }
