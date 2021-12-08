@@ -78,6 +78,7 @@ module.exports = {
           verifyData.data.payer.name.surname,
         email_address: verifyData.data.payer.email_address,
         payer_id: verifyData.data.payer.payer_id,
+        paypal_user_address: body.paypalUserShipping.address,
       };
       const orderObj = {
         paypal_order_id: paypalOrderId,
@@ -127,6 +128,7 @@ module.exports = {
           verifyData.data.payer.name.surname,
         email_address: verifyData.data.payer.email_address,
         payer_id: verifyData.data.payer.payer_id,
+        Paypal_user_address: { ...body.paypalUserShipping.address },
       };
 
       const orderObj = {

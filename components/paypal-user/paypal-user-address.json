@@ -1,0 +1,29 @@
+{
+  "collectionName": "components_paypal_user_paypal_user_addresses",
+  "info": {
+    "name": "paypal_user_address",
+    "icon": "address-card",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "address_line_1": {
+      "type": "string"
+    },
+    "address_line_2": {
+      "type": "string"
+    },
+    "admin_area_1": {
+      "type": "string"
+    },
+    "admin_area_2": {
+      "type": "string"
+    },
+    "country_code": {
+      "type": "string"
+    },
+    "postal_code": {
+      "type": "string"
+    }
+  }
+}
