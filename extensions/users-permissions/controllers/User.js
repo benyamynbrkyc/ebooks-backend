@@ -97,6 +97,7 @@ module.exports = {
         }),
         paypal_user: paypalUser,
         completed: false,
+        published_at: null,
       };
 
       try {
@@ -144,6 +145,7 @@ module.exports = {
         }),
         paypal_user: paypalUser,
         completed: false,
+        published_at: null,
       };
 
       try {
