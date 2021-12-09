@@ -551,6 +551,10 @@ module.exports = {
     });
   },
 
+  async getMonth(ctx) {
+    console.log("runs");
+    ctx.send("ok");
+  },
   /**
    * Retrieve authenticated user.
    * @return {Object|Array}

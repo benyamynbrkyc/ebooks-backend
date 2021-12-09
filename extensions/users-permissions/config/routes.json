@@ -576,6 +576,17 @@
             }
         },
         {
+            "method": "GET",
+            "path": "/users/author/getMonthlyReport",
+            "handler": "User.getMonth",
+            "config": {
+                "policies": [
+                    "isAuthor"
+                ],
+                "prefix": ""
+            }
+        },
+        {
             "method": "POST",
             "path": "/users/editBook",
             "handler": "User.editBook",
