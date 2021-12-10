@@ -578,7 +578,7 @@
         {
             "method": "GET",
             "path": "/users/author/getMonthlyReport",
-            "handler": "User.getMonth",
+            "handler": "User.getMonthlyReport",
             "config": {
                 "policies": [
                     "isAuthor"

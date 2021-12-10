@@ -21,6 +21,8 @@ const { getBook } = require("./utils/reader.js");
 const { processBookmarks } = require("./utils/bookmarks");
 const { compileData } = require("./utils/dashboard");
 
+const { queryMonthOrders, generateMonthlyReport } = require("./utils/month");
+
 module.exports = {
   async updateMe(ctx) {
     const { id } = ctx.state.user;
@@ -551,9 +553,15 @@ module.exports = {
     });
   },
 
-  async getMonth(ctx) {
-    console.log("runs");
-    ctx.send("ok");
+  async getMonthlyReport(ctx) {
+    const created_at_gte = ctx.query.created_at_gte;
+    const created_at_lte = ctx.query.created_at_lte;
+
+    // const monthData = await queryMonthOrders(created_at_gte, created_at_lte);
+
+    // const monthlyReport = await generateMonthlyReport(monthData);
+
+    ctx.send({ created_at_gte, created_at_lte });
   },
   /**
    * Retrieve authenticated user.

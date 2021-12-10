@@ -1,3 +1,7 @@
-const getData = async () => {};
+const queryMonthOrders = async (created_at_gte, created_at_lte) => {
+  const orders = await strapi.query("orders").find({});
+};
 
-export { getData };
+const generateMonthlyReport = async () => {};
+
+module.exports = { generateMonthlyReport, queryMonthOrders };
