@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_books_ediiton_types",
+  "info": {
+    "name": "ediiton_type",
+    "icon": "swatchbook"
+  },
+  "options": {},
+  "attributes": {
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "ebook",
+        "print"
+      ]
+    }
+  }
+}

@@ -17,11 +17,6 @@
       "unique": false,
       "required": true
     },
-    "author": {
-      "type": "string",
-      "required": true,
-      "unique": false
-    },
     "description": {
       "type": "text",
       "unique": false,
@@ -84,16 +79,24 @@
       "plugin": "users-permissions",
       "model": "user"
     },
-    "publisher": {
-      "type": "string"
-    },
     "is_on_sale": {
       "type": "boolean",
       "default": false
     },
     "price_original": {
       "type": "decimal",
-      "required": true
+      "required": false
+    },
+    "additional_info": {
+      "type": "component",
+      "repeatable": false,
+      "component": "books.additional-info"
+    },
+    "author": {
+      "model": "authors"
+    },
+    "publisher": {
+      "model": "publishers"
     }
   }
 }

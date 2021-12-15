@@ -1,0 +1,35 @@
+{
+  "collectionName": "components_books_additional_infos",
+  "info": {
+    "name": "additional_info",
+    "icon": "align-right",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "year_of_publication": {
+      "type": "integer"
+    },
+    "num_of_pages": {
+      "type": "integer"
+    },
+    "format_size": {
+      "type": "enumeration",
+      "enum": [
+        "A4",
+        "A5"
+      ]
+    },
+    "binding": {
+      "type": "string"
+    },
+    "illustrated": {
+      "type": "string"
+    },
+    "edition_type": {
+      "type": "component",
+      "repeatable": true,
+      "component": "books.ediiton-type"
+    }
+  }
+}

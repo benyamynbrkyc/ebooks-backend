@@ -101,6 +101,10 @@
     },
     "last_pages": {
       "type": "json"
+    },
+    "author": {
+      "via": "user",
+      "model": "authors"
     }
   }
 }

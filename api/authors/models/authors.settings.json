@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "authors",
+  "info": {
+    "name": "Authors",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "full_name": {
+      "type": "string",
+      "required": true
+    },
+    "books": {
+      "collection": "books"
+    },
+    "user": {
+      "plugin": "users-permissions",
+      "model": "user",
+      "via": "author"
+    }
+  }
+}
