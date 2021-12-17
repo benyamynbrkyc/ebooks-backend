@@ -38,8 +38,6 @@ module.exports = {
       return book;
     });
 
-    books.forEach((b) => console.log(b));
-
     return books;
   },
   async findOnePublic(ctx) {

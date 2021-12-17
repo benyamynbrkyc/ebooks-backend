@@ -272,7 +272,6 @@ module.exports = {
   },
 
   async getBook(ctx) {
-    console.log("here");
     const { id } = ctx.state.user;
 
     const user = await strapi.plugins["users-permissions"].services.user.fetch({
@@ -314,7 +313,6 @@ module.exports = {
     });
 
     verifyUser(ctx, user);
-    console.log(user.bookmarks);
     ctx.send({ bookmarks: JSON.parse(user.bookmarks) });
   },
   async setBookmarks(ctx) {
@@ -365,8 +363,6 @@ module.exports = {
     verifyUser(ctx, user);
 
     const { bookId } = ctx.request.body;
-
-    console.log(bookId);
 
     const entity = await strapi.services.books.findOne({ id: bookId });
     const book = sanitizeEntity(entity, { model: strapi.models.books });
