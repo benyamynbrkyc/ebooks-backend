@@ -7,11 +7,7 @@ const getBook = async (id) => {
 
     const eBookUrl = process.env.BASE_API_URL + book.e_book_epub.url;
 
-    return {
-      data: {
-        eBookUrl,
-      },
-    };
+    return eBookUrl;
   } catch (error) {
     console.error(error);
     throw {

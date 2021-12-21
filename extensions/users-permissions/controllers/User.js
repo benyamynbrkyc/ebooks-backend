@@ -295,14 +295,14 @@ module.exports = {
   },
 
   async getBookPublic(ctx) {
-    const { bookId } = ctx.request.body;
-    const res = await getBook(bookId);
+    const { id } = ctx.params.id;
+    try {
+      const url = await getBook(id);
 
-    if (res.error)
-      return ctx.send({ message: "An error occurred", error: res.error });
-
-    const { data } = res;
-    ctx.send({ ...data });
+      ctx.send(url);
+    } catch (error) {
+      ctx.badRequest(error);
+    }
   },
 
   async getBookmarks(ctx) {

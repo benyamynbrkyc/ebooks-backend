@@ -480,8 +480,8 @@
             }
         },
         {
-            "method": "POST",
-            "path": "/users/reader/getBook/public",
+            "method": "GET",
+            "path": "/users/reader/getBook/public/:id",
             "handler": "User.getBookPublic",
             "config": {
                 "policies": [],
