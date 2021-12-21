@@ -26,6 +26,14 @@
     },
     {
       "method": "GET",
+      "path": "/books/ids",
+      "handler": "books.getIds",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
       "path": "/books/count",
       "handler": "books.count",
       "config": {
