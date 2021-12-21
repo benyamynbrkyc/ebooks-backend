@@ -295,7 +295,7 @@ module.exports = {
   },
 
   async getBookPublic(ctx) {
-    const { id } = ctx.params.id;
+    const { id } = ctx.params;
     try {
       const url = await getBook(id);
 
