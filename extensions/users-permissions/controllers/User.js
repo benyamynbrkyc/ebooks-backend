@@ -109,7 +109,7 @@ module.exports = {
 
       try {
         const entity = await strapi.query("orders").create(orderObj);
-        return ctx.send({ message: "CREATED", entity });
+        return ctx.send({ message: "CREATED", entity, paypalOrderId });
       } catch (error) {
         return ctx.badRequest(error);
       }
