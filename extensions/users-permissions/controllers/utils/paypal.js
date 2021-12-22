@@ -32,6 +32,7 @@ const getPayPalAccessToken = async () => {
   }
 };
 
+// checks if the paypal order exists on paypal's servers
 const verifyPayPalOrderId = async (clientOrderId) => {
   const url =
     process.env.PAYPAL_SANDBOX_URL + "/v2/checkout/orders/" + clientOrderId;

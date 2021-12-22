@@ -53,9 +53,11 @@ module.exports = {
   },
 
   // process order
+  // TODO: add is ebook order check and add to user's library
   async processOrder(ctx) {
     const { id } = ctx.state.user;
 
+    // get user and verify
     const user = await strapi.plugins["users-permissions"].services.user.fetch({
       id,
     });
@@ -70,6 +72,7 @@ module.exports = {
     const verifyData = await verifyPayPalOrderId(body.orderId);
     const status = verifyData.status;
 
+    // if order exists in PayPal
     if (status === "OK") {
       const paypalOrderId = verifyData.data.id;
       const paypalTransactionId = verifyData.data.transactionId;
@@ -96,6 +99,7 @@ module.exports = {
             book_id: Number(book.book_id.toString().replace(/\D/g, "")),
             edition: book.edition,
             ebook: book.edition == "ebook",
+            book_data: { ...book },
           };
         }),
         paypal_user: paypalUser,
@@ -110,6 +114,7 @@ module.exports = {
         return ctx.badRequest(error);
       }
     } else {
+      // TODO: refactor for a better response
       return ctx.badRequest("Does not exist");
     }
   },

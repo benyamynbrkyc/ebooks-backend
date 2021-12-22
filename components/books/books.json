@@ -28,6 +28,10 @@
     "ebook": {
       "type": "boolean",
       "default": false
+    },
+    "book_data": {
+      "type": "json",
+      "private": true
     }
   }
 }
