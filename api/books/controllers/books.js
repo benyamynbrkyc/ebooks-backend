@@ -45,7 +45,7 @@ module.exports = {
 
     const entity = await strapi.services.books.findOne({ id });
     const book = sanitizeEntity(entity, { model: strapi.models.books });
-    delete book.e_book_epub;
+    if (book.e_book_epub) delete book.e_book_epub;
 
     return book;
   },

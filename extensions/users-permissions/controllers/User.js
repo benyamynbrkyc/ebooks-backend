@@ -1,5 +1,5 @@
 const _ = require("lodash");
-const { sanitizeEntity, escapeQuery } = require("strapi-utils");
+const { sanitizeEntity, escapeQuery, logger } = require("strapi-utils");
 
 const {
   verifyPayPalOrderId,
@@ -287,12 +287,18 @@ module.exports = {
 
     const { bookId } = ctx.request.body;
 
-    try {
-      const url = await getBook(bookId);
+    const userOwnedBooksIds = user.owned_books.map((book) => book.id);
 
-      ctx.send(url);
-    } catch (error) {
-      ctx.badRequest(error);
+    if (userOwnedBooksIds.includes(Number(bookId))) {
+      try {
+        const url = await getBook(bookId);
+
+        ctx.send(url);
+      } catch (error) {
+        ctx.badRequest(error);
+      }
+    } else {
+      return ctx.unauthorized("You don't own this book");
     }
   },
 
