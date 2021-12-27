@@ -288,12 +288,9 @@ module.exports = {
     const { bookId } = ctx.request.body;
 
     try {
-      const res = await getBook(bookId);
-      if (res.error)
-        return ctx.send({ message: "An error occurred", error: res.error });
+      const url = await getBook(bookId);
 
-      const { data } = res;
-      ctx.send({ ...data });
+      ctx.send(url);
     } catch (error) {
       ctx.badRequest(error);
     }
