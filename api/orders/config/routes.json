@@ -26,6 +26,14 @@
     },
     {
       "method": "POST",
+      "path": "/orders/verifyOrder",
+      "handler": "orders.verifyOrder",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
       "path": "/orders",
       "handler": "orders.create",
       "config": {

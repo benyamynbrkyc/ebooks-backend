@@ -6,6 +6,9 @@
  */
 
 const { parseMultipartData, sanitizeEntity } = require("strapi-utils");
+const {
+  verifyPayPalOrderId,
+} = require("../../../extensions/users-permissions/controllers/utils/paypal");
 
 module.exports = {
   /**
@@ -25,5 +28,16 @@ module.exports = {
     }
 
     return sanitizeEntity(entity, { model: strapi.models.restaurant });
+  },
+  async verifyOrder(ctx) {
+    const orderId = ctx.request.body.orderId;
+
+    const { status } = await verifyPayPalOrderId(orderId);
+
+    if (status === "OK") {
+      return ctx.send("OK");
+    } else {
+      return ctx.notFound("The order was not found.");
+    }
   },
 };
