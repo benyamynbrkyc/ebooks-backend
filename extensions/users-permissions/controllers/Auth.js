@@ -552,7 +552,7 @@ module.exports = {
       await strapi.plugins["email"].services.email.send({
         to: params.email,
         subject: "Uspješno ste se registrovali na eBooks.ba!",
-        text: "Dobrodošli na eBooks.ba! Istražite našu prostranu biblioteku knjiga i uživajte u njima u digitalnoj ili fizičkoj formi. Kupite svoju prvu knjigu na našoj platformi: https://ebooks.ba/shop. Ako ste dobili ovaj e-mail već ste ulogovani u Vaš profil. Ukoliko to nije slučaj, posjetite sljedeći link da se ulogujete: https://ebooks.ba/login.",
+        text: "Dobrodošli na eBooks.ba! Istražite našu prostranu biblioteku knjiga i uživajte u njima u digitalnoj ili fizičkoj formi. Kupite svoju prvu knjigu na našoj platformi: https://ebooks.ba/shop. Ako ste dobili ovaj e-mail već ste ulogovani u Vaš profil. Ukoliko to nije slučaj, posjetite sljedeći link da se ulogujete: https://ebooks.ba/login. Kliknite na link ispod da vidite Vaš profil: https://ebooks.ba/profile/",
         html,
       });
       console.log(jwt);
