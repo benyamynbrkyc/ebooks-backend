@@ -111,6 +111,15 @@
             }
         },
         {
+            "method": "PUT",
+            "path": "/users/me",
+            "handler": "User.updateMe",
+            "config": {
+                "policies": [],
+                "prefix": ""
+            }
+        },
+        {
             "method": "GET",
             "path": "/advanced",
             "handler": "UsersPermissions.getAdvancedSettings",
@@ -387,15 +396,6 @@
             }
         },
         {
-            "method": "PUT",
-            "path": "/users/me",
-            "handler": "User.updateMe",
-            "config": {
-                "policies": [],
-                "prefix": ""
-            }
-        },
-        {
             "method": "GET",
             "path": "/users/me",
             "handler": "User.me",
@@ -519,6 +519,15 @@
             "method": "POST",
             "path": "/users/author/submitRequestToBecomeAuthor/",
             "handler": "User.submitRequestToBecomeAuthor",
+            "config": {
+                "policies": [],
+                "prefix": ""
+            }
+        },
+        {
+            "method": "POST",
+            "path": "/users/sendSuccessfulRegistrationEmail",
+            "handler": "User.sendSuccessfulRegistrationEmail",
             "config": {
                 "policies": [],
                 "prefix": ""

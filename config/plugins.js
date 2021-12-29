@@ -5,7 +5,7 @@ module.exports = ({ env }) => ({
       apiKey: process.env.SENDGRID_API_KEY,
     },
     settings: {
-      defaultFrom: "ebooks.mailing@gmail.com",
+      defaultFrom: "ebooks@ebooks.ba",
     },
   },
 });

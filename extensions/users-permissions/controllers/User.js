@@ -584,4 +584,21 @@ module.exports = {
     // Send 200 `ok`
     ctx.body = data;
   },
+
+  async sendSuccessfulRegistrationEmail(ctx) {
+    const { to } = ctx.request.body;
+
+    try {
+      await strapi.plugins["email"].services.email.send({
+        to,
+        subject: "Uspješno ste se registrovali na eBooks.ba!",
+        text: "Otkrijte sve što je na našoj platformi...",
+        html: "Hello world!",
+      });
+
+      ctx.send("ok");
+    } catch (error) {
+      ctx.throw(error);
+    }
+  },
 };
