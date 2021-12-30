@@ -16,12 +16,32 @@
       "required": true
     },
     "books": {
+      "private": true,
       "collection": "books"
     },
     "user": {
+      "private": true,
       "plugin": "users-permissions",
       "model": "user",
       "via": "author"
+    },
+    "desc_short": {
+      "type": "string",
+      "required": true
+    },
+    "desc_long": {
+      "type": "text",
+      "maxLength": 400
+    },
+    "image": {
+      "model": "file",
+      "via": "related",
+      "allowedTypes": [
+        "images"
+      ],
+      "plugin": "upload",
+      "required": false,
+      "pluginOptions": {}
     }
   }
 }

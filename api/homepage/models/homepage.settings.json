@@ -11,11 +11,6 @@
     "draftAndPublish": true
   },
   "attributes": {
-    "Author": {
-      "type": "component",
-      "repeatable": false,
-      "component": "homepage.autor"
-    },
     "Quotes": {
       "type": "component",
       "repeatable": true,
