@@ -654,4 +654,14 @@ module.exports = {
       return ctx.badRequest(null, err);
     }
   },
+
+  // verify that code belongs to a user
+  async verifyPasswordResetToken(ctx) {
+    const { code } = ctx.request.body;
+
+    ctx.send({ code });
+    //  const user = await strapi
+    //    .query("user", "users-permissions")
+    //    .findOne({ resetPasswordToken: `${params.code}` });
+  },
 };
