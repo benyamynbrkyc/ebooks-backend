@@ -526,6 +526,15 @@
         },
         {
             "method": "POST",
+            "path": "/users/sendContactEmail",
+            "handler": "User.sendContactEmail",
+            "config": {
+                "policies": [],
+                "prefix": ""
+            }
+        },
+        {
+            "method": "POST",
             "path": "/users/sendSuccessfulRegistrationEmail",
             "handler": "User.sendSuccessfulRegistrationEmail",
             "config": {

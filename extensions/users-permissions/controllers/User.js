@@ -22,6 +22,7 @@ const { processBookmarks } = require("./utils/bookmarks");
 const { compileData } = require("./utils/dashboard");
 
 const { queryMonthOrders, generateMonthlyReport } = require("./utils/month");
+const { checkEmail } = require("./utils/email-validator");
 
 module.exports = {
   async updateMe(ctx) {
@@ -594,6 +595,39 @@ module.exports = {
         subject: "Uspješno ste se registrovali na eBooks.ba!",
         text: "Otkrijte sve što je na našoj platformi...",
         html: "Hello world!",
+      });
+
+      ctx.send("ok");
+    } catch (error) {
+      ctx.throw(error);
+    }
+  },
+
+  async sendContactEmail(ctx) {
+    const {
+      first_name,
+      last_name,
+      email,
+      company_or_organization,
+      subject,
+      message,
+    } = ctx.request.body;
+
+    if (!first_name || !last_name || !email || !subject || !message)
+      return ctx.throw(400, "Fields are missing");
+
+    try {
+      const isEmailValid = await checkEmail(email);
+
+      if (!isEmailValid) {
+        return ctx.notAcceptable("Email is not valid");
+      }
+
+      await strapi.plugins["email"].services.email.send({
+        to: "ebooks@ebooks.ba",
+        subject: `Kontakt Forma: ${first_name} ${last_name}`,
+        text: "Test email",
+        html: "Test email",
       });
 
       ctx.send("ok");
