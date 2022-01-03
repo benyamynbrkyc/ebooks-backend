@@ -367,10 +367,6 @@ module.exports = {
       // Send an email to the user.
       await strapi.plugins["email"].services.email.send({
         to: user.email,
-        from:
-          settings.from.email || settings.from.name
-            ? `${settings.from.name} <${settings.from.email}>`
-            : undefined,
         replyTo: settings.response_email,
         subject: settings.object,
         text: settings.message,
@@ -659,9 +655,17 @@ module.exports = {
   async verifyPasswordResetToken(ctx) {
     const { code } = ctx.request.body;
 
-    ctx.send({ code });
-    //  const user = await strapi
-    //    .query("user", "users-permissions")
-    //    .findOne({ resetPasswordToken: `${params.code}` });
+    try {
+      const user = await strapi
+        .query("user", "users-permissions")
+        .findOne({ resetPasswordToken: `${code}` });
+
+      if (!user) return ctx.notFound("User not found. Code invalid.");
+
+      ctx.send({ message: "OK", email: user.email });
+    } catch (error) {
+      console.error(error);
+      return ctx.throw(500, "An error occurred.");
+    }
   },
 };
