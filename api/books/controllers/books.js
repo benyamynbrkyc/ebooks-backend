@@ -63,7 +63,6 @@ module.exports = {
     return freeBooks;
   },
   async getIds(ctx) {
-    console.log("running");
     const entities = await strapi.query("books").model.fetchAll({
       columns: ["id"],
     });
