@@ -1,6 +1,9 @@
 "use strict";
 
-const { createContactEmailTemplate } = require("./html-templates");
+const {
+  createContactEmailTemplate,
+  welcomeTemplate,
+} = require("./html-templates");
 
 /**
  * Read the documentation (https://strapi.io/documentation/developer-docs/latest/development/backend-customization.html#core-services)
@@ -27,8 +30,8 @@ module.exports = {
       await strapi.plugins["email"].services.email.send({
         to,
         subject: "Uspješno ste se registrovali na eBooks.ba!",
-        text: "Otkrijte sve što je na našoj platformi...",
-        html: "Hello world!",
+        text: "Drago nam je da Vas vidimo kao novog člana naše platforme. Istražite širok katalog elektronskih i printanih knjiga.",
+        html: welcomeTemplate,
       });
     } catch (error) {
       throw error;
