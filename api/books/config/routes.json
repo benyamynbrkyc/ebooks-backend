@@ -73,14 +73,6 @@
       }
     },
     {
-      "method": "PATCH",
-      "path": "/books/increment/:id",
-      "handler": "books.increment",
-      "config": {
-        "policies": []
-      }
-    },
-    {
       "method": "DELETE",
       "path": "/books/:id",
       "handler": "books.delete",

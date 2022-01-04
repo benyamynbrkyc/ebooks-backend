@@ -551,15 +551,6 @@
         },
         {
             "method": "POST",
-            "path": "/users/sendSuccessfulRegistrationEmail",
-            "handler": "User.sendSuccessfulRegistrationEmail",
-            "config": {
-                "policies": [],
-                "prefix": ""
-            }
-        },
-        {
-            "method": "POST",
             "path": "/users/author/getData/all",
             "handler": "User.getDataAll",
             "config": {

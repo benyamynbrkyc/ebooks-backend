@@ -425,6 +425,7 @@ module.exports = {
   },
   async submitRequestToBecomeAuthor(ctx) {
     const { id } = ctx.state.user;
+    const { to } = ctx.request.body;
 
     const user = await strapi.plugins["users-permissions"].services.user.fetch({
       id,
@@ -441,9 +442,14 @@ module.exports = {
         }
       );
 
-      ctx.send({ updatedUser, status: "OK" });
+      await strapi.services.email.sendAuthorRequestSubmittedEmail(to);
+
+      ctx.send({
+        has_submitted_author_request: updatedUser.has_submitted_author_request,
+        status: "OK",
+      });
     } catch (error) {
-      ctx.badRequest("Could not update user.");
+      ctx.throw(500);
     }
   },
 
@@ -590,12 +596,7 @@ module.exports = {
     const { to } = ctx.request.body;
 
     try {
-      await strapi.plugins["email"].services.email.send({
-        to,
-        subject: "Uspješno ste se registrovali na eBooks.ba!",
-        text: "Otkrijte sve što je na našoj platformi...",
-        html: "Hello world!",
-      });
+      await strapi.services.email.sendSuccessfulRegistrationEmail(to);
 
       ctx.send("ok");
     } catch (error) {
