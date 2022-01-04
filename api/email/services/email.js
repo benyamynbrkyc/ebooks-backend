@@ -1,5 +1,7 @@
 "use strict";
 
+const { createContactEmailTemplate } = require("./html-templates");
+
 /**
  * Read the documentation (https://strapi.io/documentation/developer-docs/latest/development/backend-customization.html#core-services)
  * to customize this service
@@ -27,6 +29,33 @@ module.exports = {
         subject: "Uspješno ste se registrovali na eBooks.ba!",
         text: "Otkrijte sve što je na našoj platformi...",
         html: "Hello world!",
+      });
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async sendContactFormEmail(
+    first_name,
+    last_name,
+    email,
+    company_or_organization,
+    subject,
+    message
+  ) {
+    try {
+      await strapi.plugins["email"].services.email.send({
+        to: "ebooks@ebooks.ba",
+        subject: `Kontakt Forma: ${first_name} ${last_name}`,
+        text: message,
+        html: createContactEmailTemplate(
+          first_name,
+          last_name,
+          email,
+          company_or_organization,
+          subject,
+          message
+        ),
       });
     } catch (error) {
       throw error;

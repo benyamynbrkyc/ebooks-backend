@@ -624,12 +624,14 @@ module.exports = {
         return ctx.notAcceptable("Email is not valid");
       }
 
-      await strapi.plugins["email"].services.email.send({
-        to: "ebooks@ebooks.ba",
-        subject: `Kontakt Forma: ${first_name} ${last_name}`,
-        text: "Test email",
-        html: "Test email",
-      });
+      await strapi.services.email.sendContactFormEmail(
+        first_name,
+        last_name,
+        email,
+        company_or_organization,
+        subject,
+        message
+      );
 
       ctx.send("ok");
     } catch (error) {
