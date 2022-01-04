@@ -20,10 +20,10 @@
       "collection": "books"
     },
     "user": {
-      "private": true,
+      "via": "author",
       "plugin": "users-permissions",
-      "model": "user",
-      "via": "author"
+      "private": true,
+      "model": "user"
     },
     "desc_short": {
       "type": "string",

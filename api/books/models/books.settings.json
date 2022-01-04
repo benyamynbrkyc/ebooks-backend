@@ -97,6 +97,10 @@
     },
     "publisher": {
       "model": "publishers"
+    },
+    "count": {
+      "type": "integer",
+      "default": 0
     }
   }
 }

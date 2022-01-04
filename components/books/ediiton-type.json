@@ -1,8 +1,9 @@
 {
   "collectionName": "components_books_ediiton_types",
   "info": {
-    "name": "ediiton_type",
-    "icon": "swatchbook"
+    "name": "edition_type",
+    "icon": "swatchbook",
+    "description": ""
   },
   "options": {},
   "attributes": {
