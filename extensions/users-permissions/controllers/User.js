@@ -1,11 +1,8 @@
 const _ = require("lodash");
 const { sanitizeEntity, escapeQuery, logger } = require("strapi-utils");
 
-const {
-  verifyPayPalOrderId,
-  verifySubscriptionId,
-  cancelSubscription,
-} = require("./utils/paypal");
+const { verifyPayPalOrderId } = require("./utils/paypal");
+
 const { verifyUser } = require("./utils/user");
 
 const sanitizeUser = (user) =>
@@ -170,114 +167,6 @@ module.exports = {
     }
   },
 
-  async processSubscription(ctx) {
-    const { id } = ctx.state.user;
-
-    const user = await strapi.plugins["users-permissions"].services.user.fetch({
-      id,
-    });
-
-    verifyUser(ctx, user);
-
-    const { body } = ctx.request;
-    const { subscriptionId } = body;
-
-    try {
-      const { subscription: subscriptionPaypal } = await verifySubscriptionId(
-        subscriptionId
-      );
-
-      if (subscriptionPaypal.status) {
-        const updatedUser = await strapi.plugins[
-          "users-permissions"
-        ].services.user.edit(
-          { id },
-          {
-            isSubscriber: true,
-            subscription_details: JSON.stringify(subscriptionPaypal),
-            subscription_id: subscriptionPaypal.id,
-            role: {
-              id: 3,
-            },
-          }
-        );
-
-        ctx.send({
-          status: subscriptionPaypal.status,
-          subscriptionData: subscriptionPaypal,
-          updatedUser,
-        });
-      } else {
-        ctx.badRequest({ error: "NOT_FOUND", body });
-      }
-    } catch (error) {
-      ctx.badRequest(error);
-    }
-  },
-
-  async cancelSubscription(ctx) {
-    const { id } = ctx.state.user;
-
-    const user = await strapi.plugins["users-permissions"].services.user.fetch({
-      id,
-    });
-
-    verifyUser(ctx, user);
-
-    const userSubscriptionDetails = JSON.parse(user.subscription_details);
-
-    const subscriptionId = userSubscriptionDetails.id;
-
-    const { subscription: subscriptionPaypal } = await verifySubscriptionId(
-      subscriptionId
-    );
-
-    if (subscriptionPaypal.status) {
-      // if the subscription is already cancelled or inactive
-      if (subscriptionPaypal.status !== "ACTIVE") {
-        const updatedUser = await strapi.plugins[
-          "users-permissions"
-        ].services.user.edit(
-          { id },
-          {
-            isSubscriber: false,
-            subscription_details: JSON.stringify({}),
-            role: {
-              id: 1,
-            },
-            books_in_library: [],
-          }
-        );
-
-        return ctx.send({
-          message: "Subscription is already cancelled",
-          status: "CANCELLED",
-          updatedUser,
-        });
-      }
-
-      try {
-        const cancelledSubscription = await cancelSubscription(
-          subscriptionPaypal.id,
-          id
-        );
-
-        ctx.send({
-          subscriptionId,
-          ...subscriptionPaypal,
-          cancelledSubscription,
-        });
-      } catch (error) {
-        ctx.badRequest(error);
-      }
-    } else {
-      ctx.send({
-        error: subscriptionPaypal.error,
-        ...subscriptionPaypal,
-      });
-    }
-  },
-
   async getBook(ctx) {
     const { id } = ctx.state.user;
 
@@ -392,7 +281,7 @@ module.exports = {
         library: updatedUser.books_in_library,
         status: "OK",
       });
-    } else if (!book.sponsored && !user.subscriber) {
+    } else if (!book.sponsored) {
       return ctx.badRequest();
     }
 
