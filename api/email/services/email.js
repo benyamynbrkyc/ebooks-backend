@@ -64,4 +64,18 @@ module.exports = {
       throw error;
     }
   },
+
+  async sendAuthorStatusApprovedEmail(to) {
+    // TODO: create a template for this email
+    try {
+      await strapi.plugins["email"].services.email.send({
+        to,
+        subject: "Odobreni ste kao autor na eBooks.ba!",
+        text: "Drago nam je da Vas vidimo kao novog autora na našoj platformi. Objavite Vaše knjige na našu platformu već danas!",
+        html: "Drago nam je da Vas vidimo kao novog autora na našoj platformi. Objavite Vaše knjige na našu platformu već danas!",
+      });
+    } catch (error) {
+      throw error;
+    }
+  },
 };
