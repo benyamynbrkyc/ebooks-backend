@@ -88,29 +88,23 @@ module.exports = {
 
       try {
         // create order
-        const entity = await strapi.query("orders").create({
+        const newOrder = await strapi.query("orders").create({
           paypal_order_id: paypalOrderId,
           paypal_transaction_id: paypalTransactionId,
-          books: body.bookIds.map((bookId) => {
-            return { id: bookId };
-          }),
+          books: body.bookIds.map((bookId) => ({ id: bookId })),
           user: { id: body.userId },
-          Book: body.books.map((book) => {
-            return {
-              title: book.title,
-              quantity: book.quantity,
-              book_id: Number(book.book_id.toString().replace(/\D/g, "")),
-              edition: book.edition,
-              ebook: book.edition == "ebook",
-              book_data: { ...book },
-            };
-          }),
+          Book: body.books.map((book) => ({
+            title: book.title,
+            quantity: book.quantity,
+            book_id: Number(book.book_id.toString().replace(/\D/g, "")),
+            book_data: { ...book },
+          })),
           Paypal_user: paypalUser,
           completed: false,
           published_at: null,
         });
 
-        return ctx.send({ message: "CREATED", entity, paypalOrderId });
+        return ctx.send({ message: "CREATED", newOrder, paypalOrderId });
       } catch (error) {
         return ctx.badRequest(error);
       }
