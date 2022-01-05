@@ -483,19 +483,6 @@ module.exports = {
     // Send 200 `ok`
     ctx.body = data;
   },
-
-  async sendSuccessfulRegistrationEmail(ctx) {
-    const { to } = ctx.request.body;
-
-    try {
-      await strapi.services.email.sendSuccessfulRegistrationEmail(to);
-
-      ctx.send("ok");
-    } catch (error) {
-      ctx.throw(error);
-    }
-  },
-
   async sendContactEmail(ctx) {
     const {
       first_name,
