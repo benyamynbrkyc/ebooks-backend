@@ -1,7 +1,7 @@
 {
   "collectionName": "components_books_books",
   "info": {
-    "name": "books",
+    "name": "Book",
     "icon": "book-open",
     "description": ""
   },
@@ -21,13 +21,6 @@
       "type": "integer",
       "required": true,
       "unique": false
-    },
-    "edition": {
-      "type": "string"
-    },
-    "ebook": {
-      "type": "boolean",
-      "default": false
     },
     "book_data": {
       "type": "json",

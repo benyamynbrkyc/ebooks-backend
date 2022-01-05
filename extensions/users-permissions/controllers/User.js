@@ -75,6 +75,7 @@ module.exports = {
     if (status === "OK") {
       const paypalOrderId = verifyData.data.id;
       const paypalTransactionId = verifyData.data.transactionId;
+
       const paypalUser = {
         name:
           verifyData.data.payer.name.given_name +
@@ -84,30 +85,31 @@ module.exports = {
         payer_id: verifyData.data.payer.payer_id,
         paypal_user_address: body.paypalUserShipping.address,
       };
-      const orderObj = {
-        paypal_order_id: paypalOrderId,
-        paypal_transaction_id: paypalTransactionId,
-        books: body.bookIds.map((bookId) => {
-          return { id: bookId };
-        }),
-        user: { id: body.userId },
-        Book: body.books.map((book) => {
-          return {
-            title: book.title,
-            quantity: book.quantity,
-            book_id: Number(book.book_id.toString().replace(/\D/g, "")),
-            edition: book.edition,
-            ebook: book.edition == "ebook",
-            book_data: { ...book },
-          };
-        }),
-        paypal_user: paypalUser,
-        completed: false,
-        published_at: null,
-      };
 
       try {
-        const entity = await strapi.query("orders").create(orderObj);
+        // create order
+        const entity = await strapi.query("orders").create({
+          paypal_order_id: paypalOrderId,
+          paypal_transaction_id: paypalTransactionId,
+          books: body.bookIds.map((bookId) => {
+            return { id: bookId };
+          }),
+          user: { id: body.userId },
+          Book: body.books.map((book) => {
+            return {
+              title: book.title,
+              quantity: book.quantity,
+              book_id: Number(book.book_id.toString().replace(/\D/g, "")),
+              edition: book.edition,
+              ebook: book.edition == "ebook",
+              book_data: { ...book },
+            };
+          }),
+          Paypal_user: paypalUser,
+          completed: false,
+          published_at: null,
+        });
+
         return ctx.send({ message: "CREATED", entity, paypalOrderId });
       } catch (error) {
         return ctx.badRequest(error);

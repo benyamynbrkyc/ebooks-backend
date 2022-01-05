@@ -36,10 +36,23 @@
     "paypal_transaction_id": {
       "type": "string"
     },
-    "paypal_user": {
+    "Paypal_user": {
       "type": "component",
       "repeatable": false,
       "component": "paypal-user.paypal-user"
+    },
+    "order_type": {
+      "type": "enumeration",
+      "enum": [
+        "ebook",
+        "print"
+      ],
+      "required": true
+    },
+    "order_details": {
+      "type": "json",
+      "required": true,
+      "private": true
     }
   }
 }
