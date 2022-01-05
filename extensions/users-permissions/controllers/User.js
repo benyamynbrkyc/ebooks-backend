@@ -477,15 +477,17 @@ module.exports = {
 
     const body = ctx.request.body;
 
+    const author = await strapi.query("authors").findOne({ "user.id": id });
+
     const book = {
       title: body.title.charAt(0).toUpperCase() + body.title.slice(1),
-      author: user.first_name + " " + user.last_name,
+      author: author ? author.id : id,
       publisher: body.publisher,
       description: body.description,
       price: parseFloat(Number(body.price).toFixed(2)),
       cover: { id: body.coverId },
       e_book_epub: { id: body.epubId },
-      authored_by: { id: user.id },
+      authored_by: id,
       published_at: null,
     };
 
