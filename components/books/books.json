@@ -25,6 +25,9 @@
     "book_data": {
       "type": "json",
       "private": true
+    },
+    "edition": {
+      "type": "string"
     }
   }
 }
