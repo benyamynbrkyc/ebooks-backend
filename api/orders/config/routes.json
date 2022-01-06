@@ -41,6 +41,15 @@
       }
     },
     {
+      "method": "POST",
+      "path": "/orders/processOrder",
+      "handler": "orders.processOrder",
+      "config": {
+        "policies": [],
+        "prefix": ""
+      }
+    },
+    {
       "method": "PUT",
       "path": "/orders/:id",
       "handler": "orders.update",
