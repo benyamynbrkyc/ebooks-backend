@@ -24,11 +24,6 @@
       "repeatable": true,
       "component": "books.books"
     },
-    "completed": {
-      "type": "boolean",
-      "default": false,
-      "required": true
-    },
     "user": {
       "plugin": "users-permissions",
       "model": "user"
