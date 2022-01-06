@@ -77,9 +77,6 @@
       "default": false,
       "required": false
     },
-    "books_in_library": {
-      "collection": "books"
-    },
     "bookmarks": {
       "type": "text"
     },
@@ -93,6 +90,9 @@
     "author": {
       "via": "user",
       "model": "authors"
+    },
+    "books_in_library": {
+      "collection": "books"
     }
   }
 }

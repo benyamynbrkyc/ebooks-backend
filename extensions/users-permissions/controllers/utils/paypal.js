@@ -53,7 +53,12 @@ const verifyPayPalOrderId = async (clientOrderId) => {
 
     const transactionId = data.purchase_units[0].payments.captures[0].id;
 
-    return { status: "OK", data: { ...data, transactionId } };
+    return {
+      status: "OK",
+      data: { ...data, transactionId },
+      paypalOrderId: data.id,
+      paypalTransactionId: transactionId,
+    };
   } catch (error) {
     return { status: "NOT_FOUND" };
   }

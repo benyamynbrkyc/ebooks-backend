@@ -64,25 +64,24 @@ module.exports = {
     verifyUser(ctx, user);
 
     // update data
-    const body = {
-      ...ctx.request.body,
-    };
+    const { body } = ctx.request;
 
-    const verifyData = await verifyPayPalOrderId(body.orderId);
-    const status = verifyData.status;
+    const {
+      status,
+      paypalOrderId,
+      paypalTransactionId,
+      data: verifyData,
+    } = await verifyPayPalOrderId(body.orderId);
 
     // if order exists in PayPal
     if (status === "OK") {
-      const paypalOrderId = verifyData.data.id;
-      const paypalTransactionId = verifyData.data.transactionId;
-
       const paypalUser = {
         name:
-          verifyData.data.payer.name.given_name +
+          verifyData.payer.name.given_name +
           " " +
-          verifyData.data.payer.name.surname,
-        email_address: verifyData.data.payer.email_address,
-        payer_id: verifyData.data.payer.payer_id,
+          verifyData.payer.name.surname,
+        email_address: verifyData.payer.email_address,
+        payer_id: verifyData.payer.payer_id,
         paypal_user_address: body.paypalUserShipping.address,
       };
 
@@ -100,7 +99,9 @@ module.exports = {
             book_data: { ...book },
           })),
           Paypal_user: paypalUser,
-          completed: false,
+          // TODO: check order type and set here
+          order_type: "ebook",
+          order_details: { test: "test" },
           published_at: null,
         });
 
@@ -114,6 +115,7 @@ module.exports = {
     }
   },
 
+  // FIXME: maybe not needed
   async processOrderPublic(ctx) {
     const body = ctx.request.body;
 
