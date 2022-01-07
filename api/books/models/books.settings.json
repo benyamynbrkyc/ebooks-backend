@@ -93,14 +93,26 @@
       "component": "books.additional-info"
     },
     "author": {
-      "model": "authors"
+      "model": "authors",
+      "required": true
     },
     "publisher": {
       "model": "publishers"
     },
-    "count": {
+    "total_ebooks_sold": {
       "type": "integer",
-      "default": 0
+      "default": 0,
+      "private": true
+    },
+    "total_prints_sold": {
+      "type": "integer",
+      "default": 0,
+      "private": true
+    },
+    "total_sold": {
+      "type": "integer",
+      "default": 0,
+      "private": true
     }
   }
 }
