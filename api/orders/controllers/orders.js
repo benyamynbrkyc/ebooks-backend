@@ -10,6 +10,12 @@ const {
   verifyPayPalOrderId,
 } = require("../../../extensions/users-permissions/controllers/utils/paypal");
 
+const {
+  verifyUser,
+} = require("../../../extensions/users-permissions/controllers/utils/user");
+
+const { createOrder } = require("./utils/orders");
+
 module.exports = {
   /**
    * Create a record.
@@ -58,50 +64,31 @@ module.exports = {
     }
 
     // update data
-    const { body } = ctx.request;
-
     const {
-      status,
-      paypalOrderId,
-      paypalTransactionId,
-      data: verifyData,
-    } = await verifyPayPalOrderId(body.orderId);
+      body: { orderId, paypalUserShipping, bookIds, books },
+    } = ctx.request;
+
+    const { status, paypalOrderId, paypalTransactionId, paypalUser } =
+      await verifyPayPalOrderId(orderId, paypalUserShipping);
 
     // if order exists in PayPal
     if (status === "OK") {
-      const paypalUser = {
-        name:
-          verifyData.payer.name.given_name +
-          " " +
-          verifyData.payer.name.surname,
-        email_address: verifyData.payer.email_address,
-        payer_id: verifyData.payer.payer_id,
-        paypal_user_address: body.paypalUserShipping.address,
-      };
-
       try {
         // create order
-        const newOrder = await strapi.query("orders").create({
-          paypal_order_id: paypalOrderId,
-          paypal_transaction_id: paypalTransactionId,
-          books: body.bookIds.map((bookId) => ({ id: bookId })),
-          user: user ? { id: user.id } : null,
-          Book: body.books.map((book) => ({
-            title: book.title,
-            quantity: book.quantity,
-            book_id: Number(book.book_id.toString().replace(/\D/g, "")),
-            edition: book.edition,
-            book_data: book,
-          })),
-          Paypal_user: paypalUser,
-          // TODO: check order type and set here
-          order_type: "ebook",
-          order_details: { test: "test" },
-          published_at: null,
-        });
+        const order = createOrder(
+          paypalOrderId,
+          paypalTransactionId,
+          paypalUser,
+          bookIds,
+          user,
+          books
+        );
+
+        const newOrder = await strapi.query("orders").create(order);
 
         return ctx.send({ message: "CREATED", newOrder, paypalOrderId });
       } catch (error) {
+        console.error(error);
         return ctx.badRequest(error);
       }
     } else {
