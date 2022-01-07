@@ -33,7 +33,10 @@ const getPayPalAccessToken = async () => {
 };
 
 // checks if the paypal order exists on paypal's servers
-const verifyPayPalOrderId = async (clientOrderId) => {
+const verifyPayPalOrderId = async (
+  clientOrderId,
+  paypalUserShippingDetails = null
+) => {
   const url =
     process.env.PAYPAL_SANDBOX_URL + "/v2/checkout/orders/" + clientOrderId;
 
@@ -53,11 +56,21 @@ const verifyPayPalOrderId = async (clientOrderId) => {
 
     const transactionId = data.purchase_units[0].payments.captures[0].id;
 
+    let paypalUser = {
+      name: data.payer.name.given_name + " " + data.payer.name.surname,
+      email_address: data.payer.email_address,
+      payer_id: data.payer.payer_id,
+    };
+
+    if (paypalUserShippingDetails)
+      paypalUser.paypal_user_address = paypalUserShippingDetails.address;
+
     return {
       status: "OK",
       data: { ...data, transactionId },
       paypalOrderId: data.id,
       paypalTransactionId: transactionId,
+      paypalUser,
     };
   } catch (error) {
     return { status: "NOT_FOUND" };
