@@ -42,6 +42,10 @@
       "plugin": "upload",
       "required": false,
       "pluginOptions": {}
+    },
+    "orders": {
+      "via": "authors",
+      "collection": "orders"
     }
   }
 }

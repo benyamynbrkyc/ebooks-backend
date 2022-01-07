@@ -48,6 +48,12 @@
       "type": "json",
       "required": true,
       "private": true
+    },
+    "authors": {
+      "private": true,
+      "collection": "authors",
+      "via": "orders",
+      "dominant": true
     }
   }
 }
