@@ -65,7 +65,7 @@ module.exports = {
 
     // update data
     const {
-      body: { orderId, paypalUserShipping, bookIds, books },
+      body: { orderId, paypalUserShipping, bookIds, books, orderType },
     } = ctx.request;
 
     const { status, paypalOrderId, paypalTransactionId, paypalUser } =
@@ -81,7 +81,8 @@ module.exports = {
           paypalUser,
           bookIds,
           user,
-          books
+          books,
+          orderType
         );
 
         const newOrder = await strapi.query("orders").create(order);
