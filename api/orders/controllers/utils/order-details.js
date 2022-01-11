@@ -10,6 +10,25 @@ const getTotalEarnedRounded = (books) =>
     2
   );
 
+const increment = async (id, edition, value) => {
+  const field = edition == "ebook" ? "total_ebooks_sold" : "total_prints_sold";
+  console.log(id, edition, field, value);
+
+  const book = await strapi.query("books").findOne({ id });
+  console.log(book);
+  const prevValue = book[field];
+  const prevTotal = book.total_sold;
+
+  console.log(prevValue, prevTotal);
+
+  await strapi
+    .query("books")
+    .update(
+      { id },
+      { [field]: prevValue + value, total_sold: prevTotal + value }
+    );
+};
+
 const generateOrderDetailsByAuthor = (books, authorId, orderType) => {
   const items = {
     soldItems: books.filter((book) => book.author.id === authorId),
@@ -118,6 +137,10 @@ const generateOrderDetails = (orderType, books, authorIds) => {
       orderDetails = generatePrintOrderDetails(books, authorIds);
       break;
   }
+
+  books.forEach(
+    async (book) => await increment(book.id, book.edition, book.quantity)
+  );
 
   return orderDetails;
 };
