@@ -113,6 +113,14 @@
       "type": "integer",
       "default": 0,
       "private": true
+    },
+    "available_ebook": {
+      "type": "boolean",
+      "required": true
+    },
+    "available_print": {
+      "type": "boolean",
+      "required": true
     }
   }
 }

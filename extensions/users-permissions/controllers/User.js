@@ -312,6 +312,9 @@ module.exports = {
       e_book_epub: { id: body.epubId },
       authored_by: id,
       published_at: null,
+      sponsored: false,
+      available_ebook: true,
+      available_print: false,
     };
 
     try {
