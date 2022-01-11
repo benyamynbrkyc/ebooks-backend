@@ -1,10 +1,13 @@
+const { generateOrderDetails } = require("./order-details");
+
 const createOrder = (
   paypalOrderId,
   paypalTransactionId,
   paypalUser,
   bookIds,
   user,
-  books
+  books,
+  orderType
 ) => {
   return {
     paypal_order_id: paypalOrderId,
@@ -20,13 +23,14 @@ const createOrder = (
     })),
     Paypal_user: paypalUser,
     // TODO: check order type and set here
-    order_type: "ebook",
-    order_details: { test: "test" },
+    order_type: orderType,
+    order_details: generateOrderDetails(
+      orderType,
+      books,
+      books.map((book) => book.author.id)
+    ),
     published_at: null,
-    authors: books.map((book) => {
-      console.log(book);
-      return { id: book.author.id };
-    }),
+    authors: books.map((book) => ({ id: book.author.id })),
   };
 };
 
