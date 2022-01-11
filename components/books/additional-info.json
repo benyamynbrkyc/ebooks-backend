@@ -25,11 +25,6 @@
     },
     "illustrated": {
       "type": "string"
-    },
-    "edition_type": {
-      "type": "component",
-      "repeatable": true,
-      "component": "books.ediiton-type"
     }
   }
 }
