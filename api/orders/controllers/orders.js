@@ -65,7 +65,7 @@ module.exports = {
 
     // update data
     const {
-      body: { orderId, paypalUserShipping, bookIds, books, orderType },
+      body: { orderId, paypalUserShipping, books: cartBooks, orderType },
     } = ctx.request;
 
     const { status, paypalOrderId, paypalTransactionId, paypalUser } =
@@ -79,9 +79,8 @@ module.exports = {
           paypalOrderId,
           paypalTransactionId,
           paypalUser,
-          bookIds,
           user,
-          books,
+          cartBooks,
           orderType
         );
 

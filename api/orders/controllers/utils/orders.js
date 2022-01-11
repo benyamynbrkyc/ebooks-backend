@@ -4,17 +4,16 @@ const createOrder = (
   paypalOrderId,
   paypalTransactionId,
   paypalUser,
-  bookIds,
   user,
-  books,
+  cartBooks,
   orderType
 ) => {
   return {
     paypal_order_id: paypalOrderId,
     paypal_transaction_id: paypalTransactionId,
-    books: bookIds.map((bookId) => ({ id: bookId })),
+    books: cartBooks.map((book) => ({ id: book.id })),
     user: user ? { id: user.id } : null,
-    Book: books.map((book) => ({
+    Book: cartBooks.map((book) => ({
       title: book.title,
       quantity: book.quantity,
       book_id: Number(book.book_id.toString().replace(/\D/g, "")),
@@ -26,11 +25,11 @@ const createOrder = (
     order_type: orderType,
     order_details: generateOrderDetails(
       orderType,
-      books,
-      books.map((book) => book.author.id)
+      cartBooks,
+      cartBooks.map((book) => book.author.id)
     ),
     published_at: null,
-    authors: books.map((book) => ({ id: book.author.id })),
+    authors: cartBooks.map((book) => ({ id: book.author.id })),
   };
 };
 

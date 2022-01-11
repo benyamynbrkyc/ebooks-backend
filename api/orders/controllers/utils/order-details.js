@@ -1,3 +1,15 @@
+const _ = require("lodash");
+// TODO: refactor this to only include one generic function for generating order details
+
+const getTotalEarnedRounded = (books) =>
+  _.round(
+    books.reduce(
+      (acc, book) => acc + Number(book.price) * Number(book.quantity),
+      0
+    ),
+    2
+  );
+
 const generateOrderDetailsByAuthor = (books, authorId, orderType) => {
   const items = {
     soldItems: books.filter((book) => book.author.id === authorId),
@@ -18,18 +30,9 @@ const generateOrderDetailsByAuthor = (books, authorId, orderType) => {
   };
 
   const earned = {
-    totalEarned: items.soldItems.reduce(
-      (acc, book) => acc + Number(book.price),
-      0
-    ),
-    totalEarnedEbooks: items.soldEbooks.reduce(
-      (acc, book) => acc + Number(book.price),
-      0
-    ),
-    totalEarnedPrints: items.soldPrints.reduce(
-      (acc, book) => acc + Number(book.price),
-      0
-    ),
+    totalEarned: getTotalEarnedRounded(items.soldItems),
+    totalEarnedEbooks: getTotalEarnedRounded(items.soldEbooks),
+    totalEarnedPrints: getTotalEarnedRounded(items.soldPrints),
   };
 
   return {
@@ -39,6 +42,7 @@ const generateOrderDetailsByAuthor = (books, authorId, orderType) => {
   };
 };
 
+// this could be refactored like [book] and remove the need for a separate function
 const generateEbookOrderDetails = (book, authorId) => {
   const items = {
     soldItems: [book],
@@ -53,8 +57,8 @@ const generateEbookOrderDetails = (book, authorId) => {
   };
 
   const earned = {
-    totalEarned: Number(book.price),
-    totalEarnedEbooks: Number(book.price),
+    totalEarned: _.round(Number(book.price), 2),
+    totalEarnedEbooks: _.round(Number(book.price), 2),
     totalEarnedPrints: 0,
   };
 
@@ -84,9 +88,9 @@ const generatePrintOrderDetails = (books, authorIds) => {
   };
 
   const earned = {
-    totalEarned: books.reduce((acc, book) => acc + Number(book.price), 0),
+    totalEarned: getTotalEarnedRounded(items.soldItems),
     totalEarnedEbooks: 0,
-    totalEarnedPrints: books.reduce((acc, book) => acc + Number(book.price), 0),
+    totalEarnedPrints: getTotalEarnedRounded(items.soldPrints),
   };
 
   let byAuthor = {};
