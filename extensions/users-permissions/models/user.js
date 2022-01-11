@@ -5,7 +5,6 @@ module.exports = {
     async afterUpdate(result, _, data) {
       // latest up-to-date user
       const user = result;
-      console.log("this fires");
       // if the user has submitted author request and if the admin has approved it
       if (user.has_submitted_author_request && user.isAuthor) {
         try {
