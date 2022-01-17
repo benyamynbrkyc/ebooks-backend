@@ -576,6 +576,17 @@
             }
         },
         {
+            "method": "GET",
+            "path": "/users/author/getStats",
+            "handler": "User.getStats",
+            "config": {
+                "policies": [
+                    "isAuthor"
+                ],
+                "prefix": ""
+            }
+        },
+        {
             "method": "POST",
             "path": "/users/editBook",
             "handler": "User.editBook",

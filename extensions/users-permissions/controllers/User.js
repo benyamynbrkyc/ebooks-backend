@@ -425,10 +425,10 @@ module.exports = {
       ctx.badRequest(error);
     }
   },
-  /**
-   * Retrieve authenticated user.
-   * @return {Object|Array}
-   */
+
+  async getStats(ctx) {
+    ctx.send("ok");
+  },
 
   async me(ctx) {
     let data = await strapi.plugins["users-permissions"].services.user.fetch({
