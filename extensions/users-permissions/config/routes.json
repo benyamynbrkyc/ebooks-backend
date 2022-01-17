@@ -566,7 +566,7 @@
         },
         {
             "method": "GET",
-            "path": "/users/author/getMonthlyReport",
+            "path": "/users/author/getMonthlyReport/:year/:month",
             "handler": "User.getMonthlyReport",
             "config": {
                 "policies": [
