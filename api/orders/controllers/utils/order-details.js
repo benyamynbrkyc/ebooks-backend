@@ -12,14 +12,10 @@ const getTotalEarnedRounded = (books) =>
 
 const increment = async (id, edition, value) => {
   const field = edition == "ebook" ? "total_ebooks_sold" : "total_prints_sold";
-  console.log(id, edition, field, value);
 
   const book = await strapi.query("books").findOne({ id });
-  console.log(book);
   const prevValue = book[field];
   const prevTotal = book.total_sold;
-
-  console.log(prevValue, prevTotal);
 
   await strapi
     .query("books")
