@@ -5,6 +5,8 @@ const { verifyPayPalOrderId } = require("./utils/paypal");
 
 const { verifyUser } = require("./utils/user");
 
+const buildMonthRange = require("./utils/month");
+
 const sanitizeUser = (user) =>
   sanitizeEntity(user, {
     model: strapi.query("user", "users-permissions").model,
@@ -394,14 +396,21 @@ module.exports = {
   },
 
   async getMonthlyReport(ctx) {
-    const created_at_gte = ctx.query.created_at_gte;
-    const created_at_lte = ctx.query.created_at_lte;
+    const { id } = ctx.state.user;
 
-    // const monthData = await queryMonthOrders(created_at_gte, created_at_lte);
+    const { year, month } = ctx.params;
+    console.log(year, month);
 
-    // const monthlyReport = await generateMonthlyReport(monthData);
+    try {
+      const orders = await strapi.query("orders").find({
+        ...buildMonthRange(year, month),
+      });
 
-    ctx.send({ created_at_gte, created_at_lte });
+      ctx.send(orders);
+    } catch (error) {
+      console.error(error);
+      ctx.badRequest(error);
+    }
   },
   /**
    * Retrieve authenticated user.
