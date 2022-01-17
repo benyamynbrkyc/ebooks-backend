@@ -402,13 +402,26 @@ module.exports = {
     console.log(year, month);
 
     try {
-      const orders = await strapi.query("orders").find({
+      const ordersInMonth = await strapi.query("orders").find({
         ...buildMonthRange(year, month),
       });
 
-      ctx.send(orders);
+      try {
+        const {
+          author: { id: authorId },
+        } = await strapi.query("user", "users-permissions").findOne({ id: id });
+
+        const authorOrders = ordersInMonth
+          .filter((o) => o.authors.map((a) => a.id).includes(authorId))
+          .map((o) => o.order_details.byAuthor[`${authorId}`])
+          .reverse();
+
+        ctx.send(authorOrders);
+      } catch (error) {
+        console.error(error);
+        return ctx.notFound("User is not an author", error);
+      }
     } catch (error) {
-      console.error(error);
       ctx.badRequest(error);
     }
   },
