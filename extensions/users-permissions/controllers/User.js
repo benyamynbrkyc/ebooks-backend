@@ -415,7 +415,8 @@ module.exports = {
       try {
         const {
           author: { id: authorId },
-        } = await strapi.query("user", "users-permissions").findOne({ id: id });
+          e,
+        } = await strapi.query("user", "users-permissions").findOne({ id });
 
         try {
           const authorOrders = await getAuthorOrders(authorId, orders);
