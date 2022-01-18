@@ -422,7 +422,6 @@ module.exports = {
           const authorOrders = await getAuthorOrders(authorId, orders);
           ctx.send(authorOrders);
         } catch (error) {
-          console.log("here");
           console.error(error);
           return ctx.badRequest("Could not fetch orders");
         }
