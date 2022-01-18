@@ -91,7 +91,6 @@ const getCopiesSold = async (authorId, authorOrders) => {
   let copiesSold = {};
 
   authorBooksIds.forEach((id) => {
-    console.log(id);
     const bookCopiesSold = authorOrders.reduce((acc, order) => {
       const currentBook = order.copiesSold.copiesSoldByBook[`${id}`];
       if (currentBook)
@@ -106,7 +105,6 @@ const getCopiesSold = async (authorId, authorOrders) => {
       copiesSold: bookCopiesSold,
     };
   });
-  console.log(copiesSold);
   return copiesSold;
 };
 
