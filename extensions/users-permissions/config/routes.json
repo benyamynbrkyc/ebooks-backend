@@ -515,15 +515,6 @@
         },
         {
             "method": "POST",
-            "path": "/users/author/getData/all",
-            "handler": "User.getDataAll",
-            "config": {
-                "policies": [],
-                "prefix": ""
-            }
-        },
-        {
-            "method": "POST",
             "path": "/users/author/submitNewBook",
             "handler": "User.submitNewBook",
             "config": {

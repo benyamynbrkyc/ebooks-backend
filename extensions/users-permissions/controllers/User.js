@@ -5,7 +5,7 @@ const { verifyPayPalOrderId } = require("./utils/paypal");
 
 const { verifyUser } = require("./utils/user");
 
-const buildMonthRange = require("./utils/month");
+const { buildMonthRange, getAuthorOrders } = require("./utils/dashboard");
 
 const sanitizeUser = (user) =>
   sanitizeEntity(user, {
@@ -18,9 +18,6 @@ const formatError = (error) => [
 
 const { getBook } = require("./utils/reader.js");
 const { processBookmarks } = require("./utils/bookmarks");
-const { compileData } = require("./utils/dashboard");
-
-const { queryMonthOrders, generateMonthlyReport } = require("./utils/month");
 
 const { checkEmail } = require("./utils/email-validator");
 
@@ -279,19 +276,6 @@ module.exports = {
     }
   },
 
-  async getDataAll(ctx) {
-    const { id } = ctx.state.user;
-
-    const user = await strapi.plugins["users-permissions"].services.user.fetch({
-      id,
-    });
-    verifyUser(ctx, user);
-
-    const data = await compileData(user);
-
-    ctx.send(data);
-  },
-
   async submitNewBook(ctx) {
     const { id } = ctx.state.user;
 
@@ -399,7 +383,6 @@ module.exports = {
     const { id } = ctx.state.user;
 
     const { year, month } = ctx.params;
-    console.log(year, month);
 
     try {
       const ordersInMonth = await strapi.query("orders").find({
@@ -411,10 +394,7 @@ module.exports = {
           author: { id: authorId },
         } = await strapi.query("user", "users-permissions").findOne({ id: id });
 
-        const authorOrders = ordersInMonth
-          .filter((o) => o.authors.map((a) => a.id).includes(authorId))
-          .map((o) => o.order_details.byAuthor[`${authorId}`])
-          .reverse();
+        const authorOrders = await getAuthorOrders(authorId, ordersInMonth);
 
         ctx.send(authorOrders);
       } catch (error) {
@@ -427,7 +407,31 @@ module.exports = {
   },
 
   async getStats(ctx) {
-    ctx.send("ok");
+    const { id } = ctx.state.user;
+
+    try {
+      const orders = await strapi.query("orders").find();
+
+      try {
+        const {
+          author: { id: authorId },
+        } = await strapi.query("user", "users-permissions").findOne({ id: id });
+
+        try {
+          const authorOrders = await getAuthorOrders(authorId, orders);
+          ctx.send(authorOrders);
+        } catch (error) {
+          console.log("here");
+          console.error(error);
+          return ctx.badRequest("Could not fetch orders");
+        }
+      } catch (error) {
+        console.error(error);
+        return ctx.notFound("User is not an author", error);
+      }
+    } catch (error) {
+      ctx.badRequest(error);
+    }
   },
 
   async me(ctx) {
