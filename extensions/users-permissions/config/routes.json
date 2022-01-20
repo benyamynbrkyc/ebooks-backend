@@ -557,6 +557,17 @@
         },
         {
             "method": "GET",
+            "path": "/users/author/profile",
+            "handler": "User.getAuthorProfile",
+            "config": {
+                "policies": [
+                    "isAuthor"
+                ],
+                "prefix": ""
+            }
+        },
+        {
+            "method": "GET",
             "path": "/users/author/getMonthlyReport/:year/:month",
             "handler": "User.getMonthlyReport",
             "config": {

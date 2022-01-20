@@ -379,6 +379,18 @@ module.exports = {
     });
   },
 
+  async getAuthorProfile(ctx) {
+    const { id } = ctx.state.user;
+
+    const author = await strapi
+      .query("authors")
+      .findOne({ "user.id": id }, ["books"]);
+
+    if (!author) return ctx.notFound("Author not found");
+
+    ctx.send(author);
+  },
+
   async getMonthlyReport(ctx) {
     const { id } = ctx.state.user;
 
