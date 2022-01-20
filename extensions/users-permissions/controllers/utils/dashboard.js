@@ -1,3 +1,5 @@
+const _ = require("lodash");
+
 const months = {
   jan: {
     start: "01-01",
@@ -68,8 +70,6 @@ const buildMonthRange = (year, monthName) => {
   };
 };
 
-const compileStats = (authorOrders) => {};
-
 const getCopiesSoldByBook = (soldItems) => {
   let books = {};
 
@@ -78,6 +78,7 @@ const getCopiesSoldByBook = (soldItems) => {
       id: item.id,
       title: item.title,
       copiesSold: item.quantity,
+      earned: _.round(item.price * item.quantity, 2),
     };
   });
 
@@ -88,7 +89,7 @@ const getCopiesSold = async (authorId, authorOrders) => {
   const author = await strapi.query("authors").findOne({ id: authorId });
   const authorBooksIds = author.books.map((b) => b.id);
 
-  let copiesSold = {};
+  let copiesSold = { byBook: {}, total: undefined, earned: undefined };
 
   authorBooksIds.forEach((id) => {
     const bookCopiesSold = authorOrders.reduce((acc, order) => {
@@ -99,12 +100,32 @@ const getCopiesSold = async (authorId, authorOrders) => {
       return acc + 0;
     }, 0);
 
-    copiesSold[`${id}`] = {
+    const earned = authorOrders.reduce((acc, order) => {
+      const currentBook = order.copiesSold.copiesSoldByBook[`${id}`];
+      if (currentBook)
+        return acc + order.copiesSold.copiesSoldByBook[`${id}`].earned;
+
+      return acc + 0;
+    }, 0);
+
+    copiesSold.byBook[`${id}`] = {
       id,
       title: author.books[author.books.findIndex((b) => b.id == id)].title,
       copiesSold: bookCopiesSold,
+      earned: _.round(earned, 2),
     };
   });
+
+  copiesSold.total = Object.values(copiesSold.byBook).reduce(
+    (acc, sale) => acc + sale.copiesSold,
+    0
+  );
+
+  copiesSold.earned = Object.values(copiesSold.byBook).reduce(
+    (acc, sale) => acc + sale.earned,
+    0
+  );
+
   return copiesSold;
 };
 
