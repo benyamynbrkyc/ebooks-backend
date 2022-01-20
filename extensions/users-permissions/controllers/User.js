@@ -384,7 +384,7 @@ module.exports = {
 
     const author = await strapi
       .query("authors")
-      .findOne({ "user.id": id }, ["books"]);
+      .findOne({ "user.id": id }, ["books.cover"]);
 
     if (!author) return ctx.notFound("Author not found");
 
