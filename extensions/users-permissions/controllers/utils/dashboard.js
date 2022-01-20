@@ -112,10 +112,8 @@ const getAuthorOrders = async (authorId, orders) => {
   const authorOrders = orders
     .filter((o) => o.authors.map((a) => a.id).includes(authorId))
     .map((o) => ({
-      orders: {
-        ...o.order_details.byAuthor[`${authorId}`],
-        date: o.created_at,
-      },
+      ...o.order_details.byAuthor[`${authorId}`],
+      date: o.created_at,
       copiesSold: {
         copiesSoldByBook: getCopiesSoldByBook(
           o.order_details.byAuthor[`${authorId}`].items.soldItems
