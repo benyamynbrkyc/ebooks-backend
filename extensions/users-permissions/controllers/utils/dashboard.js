@@ -89,7 +89,13 @@ const getCopiesSold = async (authorId, authorOrders) => {
   const author = await strapi.query("authors").findOne({ id: authorId });
   const authorBooksIds = author.books.map((b) => b.id);
 
-  let copiesSold = { byBook: {}, total: undefined, earned: undefined };
+  let copiesSold = {
+    byBook: {},
+    total: undefined,
+    earned: undefined,
+    ebooks: undefined,
+    prints: undefined,
+  };
 
   authorBooksIds.forEach((id) => {
     const bookCopiesSold = authorOrders.reduce((acc, order) => {
@@ -123,6 +129,15 @@ const getCopiesSold = async (authorId, authorOrders) => {
 
   copiesSold.earned = Object.values(copiesSold.byBook).reduce(
     (acc, sale) => acc + sale.earned,
+    0
+  );
+
+  copiesSold.ebooks = authorOrders.reduce(
+    (acc, order) => acc + order.individual.totalIndividualEbooksSold,
+    0
+  );
+  copiesSold.prints = authorOrders.reduce(
+    (acc, order) => acc + order.individual.totalIndividualPrintsSold,
     0
   );
 
