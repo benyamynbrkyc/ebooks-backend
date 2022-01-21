@@ -5,7 +5,7 @@ const { verifyPayPalOrderId } = require("./utils/paypal");
 
 const { verifyUser } = require("./utils/user");
 
-const { buildMonthRange, getAuthorOrders } = require("./utils/dashboard");
+const { buildMonthRange, getOrderData } = require("./utils/dashboard");
 
 const sanitizeUser = (user) =>
   sanitizeEntity(user, {
@@ -406,9 +406,9 @@ module.exports = {
           author: { id: authorId },
         } = await strapi.query("user", "users-permissions").findOne({ id: id });
 
-        const authorOrders = await getAuthorOrders(authorId, ordersInMonth);
+        const data = await getOrderData(authorId, ordersInMonth);
 
-        ctx.send(authorOrders);
+        ctx.send(data);
       } catch (error) {
         console.error(error);
         return ctx.notFound("User is not an author", error);
@@ -431,8 +431,17 @@ module.exports = {
         } = await strapi.query("user", "users-permissions").findOne({ id });
 
         try {
-          const authorOrders = await getAuthorOrders(authorId, orders);
-          ctx.send(authorOrders);
+          const data = await getOrderData(authorId, orders);
+          console.log(data);
+          if (!data) return (ctx.response.status = 204);
+
+          const earliestOrder = data.authorOrders[0].date;
+          const latestOrder =
+            data.authorOrders[data.authorOrders.length - 1].date;
+
+          console.log(earliestOrder, latestOrder);
+
+          ctx.send({ ...data, earliestOrder, latestOrder });
         } catch (error) {
           console.error(error);
           return ctx.badRequest("Could not fetch orders");

@@ -144,7 +144,7 @@ const getCopiesSold = async (authorId, authorOrders) => {
   return copiesSold;
 };
 
-const getAuthorOrders = async (authorId, orders) => {
+const getOrderData = async (authorId, orders) => {
   const authorOrders = orders
     .filter((o) => o.authors.map((a) => a.id).includes(authorId))
     .map((o) => ({
@@ -158,6 +158,8 @@ const getAuthorOrders = async (authorId, orders) => {
     }))
     .reverse();
 
+  if (authorOrders.length === 0) return null;
+
   const copiesSold = await getCopiesSold(authorId, authorOrders);
 
   return { authorOrders, copiesSold };
@@ -165,5 +167,5 @@ const getAuthorOrders = async (authorId, orders) => {
 
 module.exports = {
   buildMonthRange,
-  getAuthorOrders,
+  getOrderData,
 };
