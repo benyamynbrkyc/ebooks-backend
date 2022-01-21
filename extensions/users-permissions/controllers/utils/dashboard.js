@@ -79,6 +79,10 @@ const getCopiesSoldByBook = (soldItems) => {
       title: item.title,
       copiesSold: item.quantity,
       earned: _.round(item.price * item.quantity, 2),
+      type: {
+        prints: item.edition == "print" ? item.quantity : 0,
+        ebooks: item.edition == "ebook" ? item.quantity : 0,
+      },
     };
   });
 
@@ -114,11 +118,31 @@ const getCopiesSold = async (authorId, authorOrders) => {
       return acc + 0;
     }, 0);
 
+    const prints = authorOrders.reduce((acc, order) => {
+      const currentBook = order.copiesSold.copiesSoldByBook[`${id}`];
+      if (currentBook)
+        return acc + order.copiesSold.copiesSoldByBook[`${id}`].type.prints;
+
+      return acc + 0;
+    }, 0);
+
+    const ebooks = authorOrders.reduce((acc, order) => {
+      const currentBook = order.copiesSold.copiesSoldByBook[`${id}`];
+      if (currentBook)
+        return acc + order.copiesSold.copiesSoldByBook[`${id}`].type.ebooks;
+
+      return acc + 0;
+    }, 0);
+
     copiesSold.byBook[`${id}`] = {
       id,
       title: author.books[author.books.findIndex((b) => b.id == id)].title,
       copiesSold: bookCopiesSold,
       earned: _.round(earned, 2),
+      type: {
+        prints,
+        ebooks,
+      },
     };
   });
 
@@ -132,12 +156,13 @@ const getCopiesSold = async (authorId, authorOrders) => {
     0
   );
 
-  copiesSold.ebooks = authorOrders.reduce(
-    (acc, order) => acc + order.individual.totalIndividualEbooksSold,
+  copiesSold.ebooks = Object.values(copiesSold.byBook).reduce(
+    (acc, sale) => acc + sale.type.ebooks,
     0
   );
-  copiesSold.prints = authorOrders.reduce(
-    (acc, order) => acc + order.individual.totalIndividualPrintsSold,
+
+  copiesSold.prints = Object.values(copiesSold.byBook).reduce(
+    (acc, sale) => acc + sale.type.prints,
     0
   );
 
