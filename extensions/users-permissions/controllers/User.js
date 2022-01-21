@@ -407,6 +407,7 @@ module.exports = {
         } = await strapi.query("user", "users-permissions").findOne({ id: id });
 
         const data = await getOrderData(authorId, ordersInMonth);
+        if (!data) return (ctx.response.status = 204);
 
         ctx.send(data);
       } catch (error) {
