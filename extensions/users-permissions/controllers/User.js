@@ -415,6 +415,7 @@ module.exports = {
         return ctx.notFound("User is not an author", error);
       }
     } catch (error) {
+      console.error(error);
       ctx.badRequest(error);
     }
   },
