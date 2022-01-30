@@ -276,6 +276,18 @@ module.exports = {
     }
   },
 
+  /*
+  expected body contents:
+  {
+    title,
+    description,
+    price,
+    publisher,
+    available_print,
+    coverId,
+    epubId
+  }
+  */
   async submitNewBook(ctx) {
     const { id } = ctx.state.user;
 
@@ -300,7 +312,7 @@ module.exports = {
       published_at: null,
       sponsored: false,
       available_ebook: true,
-      available_print: false,
+      available_print: body.available_print,
     };
 
     try {
@@ -434,14 +446,11 @@ module.exports = {
 
         try {
           const data = await getOrderData(authorId, orders);
-          console.log(data);
           if (!data) return (ctx.response.status = 204);
 
           const earliestOrder = data.authorOrders[0].date;
           const latestOrder =
             data.authorOrders[data.authorOrders.length - 1].date;
-
-          console.log(earliestOrder, latestOrder);
 
           ctx.send({ ...data, earliestOrder, latestOrder });
         } catch (error) {
