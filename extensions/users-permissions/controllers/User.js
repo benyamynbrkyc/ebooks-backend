@@ -317,6 +317,11 @@ module.exports = {
 
     try {
       const createdBook = await strapi.services.books.create(book);
+      // update author books list
+      await strapi.services.authors.update(
+        { id: author.id },
+        { books: [...author.books, createdBook.id] }
+      );
 
       ctx.send(createdBook);
     } catch (error) {
