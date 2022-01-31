@@ -1,6 +1,5 @@
 "use strict";
 const { sanitizeEntity } = require("strapi-utils");
-const qs = require("querystring");
 
 /**
  * Read the documentation (https://strapi.io/documentation/developer-docs/latest/development/backend-customization.html#core-controllers)
@@ -9,11 +8,11 @@ const qs = require("querystring");
 
 module.exports = {
   async findPublic() {
-    const entities = await strapi.query("books").find({});
+    const entities = await strapi.query("books").find({ _limit: -1 });
 
     // TODO: delete created_by ... from cover object
     const books = entities
-      .filter((book) => book.published_at != null)
+      .filter((entity) => entity.published_at != null)
       .map((book) => {
         delete book.e_book_epub;
         if (book.author) {
@@ -41,6 +40,8 @@ module.exports = {
         return book;
       });
 
+    console.log(books);
+    console.log(books.length);
     return books;
   },
   async findOnePublic(ctx) {
@@ -66,12 +67,16 @@ module.exports = {
     return freeBooks;
   },
   async getIds(ctx) {
-    const entities = await strapi.query("books").model.fetchAll({
-      columns: ["id"],
-    });
+    const entities = await strapi
+      .query("books")
+      .model.query((qb) => {
+        qb.where("published_at", "NOT LIKE", "null");
+      })
+      .fetchAll({
+        columns: ["id"],
+      });
 
-    const ids = entities.map((entity) => entity.id);
-
-    ctx.send(ids);
+    const books = entities.map((entity) => entity.id);
+    ctx.send(books);
   },
 };
