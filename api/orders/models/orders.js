@@ -3,7 +3,7 @@
 module.exports = {
   lifecycles: {
     async afterCreate(result, data) {
-      if (!data.user) return;
+      if (!data.user || data.order_type == "print") return;
 
       try {
         const orderId = result.id;
