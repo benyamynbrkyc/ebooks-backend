@@ -2,7 +2,9 @@
 
 const {
   createContactEmailTemplate,
-  welcomeTemplate,
+  createWelcomeTemplate,
+  createPrintDistributionEmailTemplate,
+  createBookSubmittedEmailTemplate,
 } = require("./html-templates");
 
 /**
@@ -31,7 +33,7 @@ module.exports = {
         to,
         subject: "Uspješno ste se registrovali na eBooks.ba!",
         text: "Drago nam je da Vas vidimo kao novog člana naše platforme. Istražite širok katalog elektronskih i printanih knjiga.",
-        html: welcomeTemplate,
+        html: createWelcomeTemplate(),
       });
     } catch (error) {
       throw error;
@@ -76,6 +78,35 @@ module.exports = {
       });
     } catch (error) {
       throw error;
+    }
+  },
+
+  async sendBookSubmittedEmail(book_details) {
+    try {
+      await strapi.plugins["email"].services.email.send({
+        to: "ebooks@ebooks.ba",
+        subject: "Nova knjiga je dodana na eBooks.ba!",
+        text: `Autor ${book_details.author.full_name} je dodao novu knjigu, ${book_details.title}, na eBooks.ba.`,
+        html: createBookSubmittedEmailTemplate(book_details),
+      });
+    } catch (error) {
+      console.error(error);
+      throw { error };
+    }
+  },
+
+  async sendPrintDistributionEmail(book_details) {
+    try {
+      await strapi.plugins["email"].services.email.send({
+        to: "ebooks@ebooks.ba",
+        subject: "Zahtjev za distribuciju printa",
+        text: `Autor ${book_details.author.full_name} je napravio zahtjev za distribuciju printane forme knjige ${book_details.title} na eBooks.ba. Email: ${book_details.author.user.email}`,
+        html: createPrintDistributionEmailTemplate(book_details),
+      });
+    } catch (error) {
+      console.error(error);
+
+      throw { error };
     }
   },
 };

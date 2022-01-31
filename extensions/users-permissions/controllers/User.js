@@ -284,6 +284,7 @@ module.exports = {
     price,
     publisher,
     available_print,
+    categories,
     coverId,
     epubId
   }
@@ -313,6 +314,7 @@ module.exports = {
       sponsored: false,
       available_ebook: true,
       available_print: body.available_print,
+      category: body.categories,
     };
 
     try {
@@ -322,6 +324,16 @@ module.exports = {
         { id: author.id },
         { books: [...author.books, createdBook.id] }
       );
+      await strapi.services.email.sendBookSubmittedEmail({
+        ...createdBook,
+        author,
+      });
+
+      if (createdBook.available_print)
+        await strapi.services.email.sendPrintDistributionEmail({
+          ...createdBook,
+          author,
+        });
 
       ctx.send(createdBook);
     } catch (error) {
