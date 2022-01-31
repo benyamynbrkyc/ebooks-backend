@@ -57,7 +57,10 @@ module.exports = {
     ctx.send(book);
   },
   async findFreeBooks(ctx) {
-    const entities = await strapi.services.books.find({ sponsored: true });
+    const entities = await strapi.services.books.find({
+      sponsored: true,
+      _limit: -1,
+    });
     const freeBooks = entities.map((entity) => {
       entity = sanitizeEntity(entity, { model: strapi.models.books });
       delete entity.e_book_epub;

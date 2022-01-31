@@ -10,7 +10,7 @@ module.exports = {
     try {
       const entities = await strapi
         .query("publishers")
-        .find({}, ["id", "name"]);
+        .find({ _limit: -1 }, ["id", "name"]);
 
       entities.forEach((e) => {
         delete e.created_by;

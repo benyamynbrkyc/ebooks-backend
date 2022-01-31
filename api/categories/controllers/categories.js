@@ -19,7 +19,10 @@ module.exports = {
     if (ctx.query._q) {
       entities = await strapi.services.categories.search(ctx.query);
     } else {
-      entities = await strapi.services.categories.find(ctx.query);
+      entities = await strapi.services.categories.find({
+        ...ctx.query,
+        _limit: -1,
+      });
     }
 
     return entities.map((entity) => {

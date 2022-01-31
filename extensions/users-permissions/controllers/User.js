@@ -428,6 +428,7 @@ module.exports = {
     try {
       const ordersInMonth = await strapi.query("orders").find({
         ...buildMonthRange(year, month),
+        _limit: -1,
       });
 
       try {
@@ -453,7 +454,7 @@ module.exports = {
     const { id } = ctx.state.user;
 
     try {
-      const orders = await strapi.query("orders").find();
+      const orders = await strapi.query("orders").find({ _limit: -1 });
 
       try {
         const {
