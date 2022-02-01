@@ -266,6 +266,12 @@ module.exports = {
       );
 
       await strapi.services.email.sendAuthorRequestSubmittedEmail(to);
+      await strapi.services.email.sendAuthorRequestReviewEmail({
+        email: to,
+        full_name: user.first_name + " " + user.last_name,
+        username: user.username,
+        id,
+      });
 
       ctx.send({
         has_submitted_author_request: updatedUser.has_submitted_author_request,
@@ -301,15 +307,16 @@ module.exports = {
 
     const author = await strapi.query("authors").findOne({ "user.id": id });
 
+    if (!author) return ctx.notFound("Author not found");
+
     const book = {
       title: body.title.charAt(0).toUpperCase() + body.title.slice(1),
-      author: author ? author.id : id,
+      author: author.id,
       publisher: body.publisher,
       description: body.description,
       price: parseFloat(Number(body.price).toFixed(2)),
       cover: { id: body.coverId },
       e_book_epub: { id: body.epubId },
-      authored_by: id,
       published_at: null,
       sponsored: false,
       available_ebook: true,
@@ -382,7 +389,7 @@ module.exports = {
 
     const book = await strapi.services.books.findOne({ id: bookId });
 
-    if (book.authored_by.id !== id) {
+    if (book.author.id !== ctx.state.user.author) {
       return ctx.throw(401, "access_denied", { user: user });
     }
 
@@ -410,6 +417,7 @@ module.exports = {
 
   async getAuthorProfile(ctx) {
     const { id } = ctx.state.user;
+    console.log(ctx.state.user.author);
 
     const author = await strapi
       .query("authors")
