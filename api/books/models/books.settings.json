@@ -75,10 +75,6 @@
       "required": false,
       "pluginOptions": {}
     },
-    "authored_by": {
-      "plugin": "users-permissions",
-      "model": "user"
-    },
     "is_on_sale": {
       "type": "boolean",
       "default": false
