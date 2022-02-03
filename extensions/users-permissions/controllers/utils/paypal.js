@@ -1,7 +1,7 @@
 const axios = require("axios");
 
 const getPayPalAccessToken = async () => {
-  const authUrl = process.env.PAYPAL_SANDBOX_URL + "/v1/oauth2/token";
+  const authUrl = process.env.PAYPAL_API + "/v1/oauth2/token";
 
   const username = process.env.PAYPAL_CLIENT_ID;
   const password = process.env.PAYPAL_SECRET;
@@ -37,8 +37,7 @@ const verifyPayPalOrderId = async (
   clientOrderId,
   paypalUserShippingDetails = null
 ) => {
-  const url =
-    process.env.PAYPAL_SANDBOX_URL + "/v2/checkout/orders/" + clientOrderId;
+  const url = process.env.PAYPAL_API + "/v2/checkout/orders/" + clientOrderId;
 
   const payPalAccessToken = await getPayPalAccessToken();
 
@@ -78,8 +77,7 @@ const verifyPayPalOrderId = async (
 };
 
 const getTransactionId = async (orderId) => {
-  const url =
-    process.env.PAYPAL_SANDBOX_URL + "/v2/checkout/orders/" + clientOrderId;
+  const url = process.env.PAYPAL_API + "/v2/checkout/orders/" + clientOrderId;
 };
 
 module.exports = {
