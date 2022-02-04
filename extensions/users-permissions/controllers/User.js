@@ -50,56 +50,6 @@ module.exports = {
     ctx.send({ ...data });
   },
 
-  // FIXME: maybe not needed
-  async processOrderPublic(ctx) {
-    const body = ctx.request.body;
-
-    const verifyData = await verifyPayPalOrderId(body.orderId);
-    const status = verifyData.status;
-
-    if (status === "OK") {
-      const paypalOrderId = verifyData.data.id;
-      const paypalTransactionId = verifyData.data.transactionId;
-      const paypalUser = {
-        name:
-          verifyData.data.payer.name.given_name +
-          " " +
-          verifyData.data.payer.name.surname,
-        email_address: verifyData.data.payer.email_address,
-        payer_id: verifyData.data.payer.payer_id,
-        Paypal_user_address: { ...body.paypalUserShipping.address },
-      };
-
-      const orderObj = {
-        paypal_order_id: paypalOrderId,
-        paypal_transaction_id: paypalTransactionId,
-        books: body.bookIds.map((bookId) => {
-          return { id: bookId };
-        }),
-        Book: body.books.map((book) => {
-          return {
-            title: book.title,
-            quantity: book.quantity,
-            book_id: book.book_id,
-            edition: book.edition,
-          };
-        }),
-        paypal_user: paypalUser,
-        completed: false,
-        published_at: null,
-      };
-
-      try {
-        const entity = await strapi.query("orders").create(orderObj);
-        return ctx.send({ message: "CREATED", entity });
-      } catch (error) {
-        return ctx.badRequest(error);
-      }
-    } else {
-      return ctx.badRequest("Does not exist");
-    }
-  },
-
   async getBook(ctx) {
     const { id } = ctx.state.user;
 
@@ -417,7 +367,6 @@ module.exports = {
 
   async getAuthorProfile(ctx) {
     const { id } = ctx.state.user;
-    console.log(ctx.state.user.author);
 
     const author = await strapi
       .query("authors")
