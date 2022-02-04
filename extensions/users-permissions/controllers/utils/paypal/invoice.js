@@ -1,3 +1,4 @@
+const axios = require("axios");
 const {
   getRecipient,
   getToday,
@@ -6,6 +7,7 @@ const {
   getValueWithoutVat,
   getShippingMethodDetails,
   getTotalPaid,
+  getPayPalAccessToken,
 } = require("./helpers");
 
 const buildInvoice = async ({ data, cartBooks, shippingMethod }) => {
@@ -115,6 +117,33 @@ const buildInvoice = async ({ data, cartBooks, shippingMethod }) => {
   return invoice;
 };
 
+const createDraftInvoice = async ({ invoice }) => {
+  console.log();
+  try {
+    const config = {
+      method: "post",
+      url: process.env.PAYPAL_API + "/v2/invoicing/invoices",
+      headers: {
+        Authorization: `Bearer ${await getPayPalAccessToken()}`,
+        "Content-Type": "application/json",
+      },
+      data: {
+        ...invoice,
+      },
+    };
+
+    const { data: newInvoiceDraft } = await axios(config);
+    console.log(newInvoiceDraft);
+    return newInvoiceDraft;
+    console.log(data);
+  } catch (error) {
+    console.error({ ...error });
+    console.log(error.response.data);
+    throw error;
+  }
+};
+
 module.exports = {
   buildInvoice,
+  createDraftInvoice,
 };

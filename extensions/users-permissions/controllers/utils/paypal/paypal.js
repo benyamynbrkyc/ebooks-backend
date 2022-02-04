@@ -1,39 +1,7 @@
-const { getRecipient } = require("./helpers");
-const { buildInvoice } = require("./invoice");
+const { getRecipient, getPayPalAccessToken } = require("./helpers");
+const { buildInvoice, createDraftInvoice } = require("./invoice");
 
 const axios = require("axios");
-
-const getPayPalAccessToken = async () => {
-  const authUrl = process.env.PAYPAL_API + "/v1/oauth2/token";
-
-  const username = process.env.PAYPAL_CLIENT_ID;
-  const password = process.env.PAYPAL_SECRET;
-
-  try {
-    const {
-      data: { access_token: accessToken },
-    } = await axios({
-      url: authUrl,
-      method: "post",
-      headers: {
-        Accept: "application/json",
-        "Accept-Language": "en_US",
-        "content-type": "application/x-www-form-urlencoded",
-      },
-      auth: {
-        username,
-        password,
-      },
-      params: {
-        grant_type: "client_credentials",
-      },
-    });
-
-    return accessToken;
-  } catch (error) {
-    return error;
-  }
-};
 
 // checks if the paypal order exists on paypal's servers
 const verifyPayPalOrderId = async (clientOrderId) => {
@@ -82,6 +50,8 @@ const getTransactionId = async (orderId) => {
 const createInvoice = async ({ data, cartBooks, shippingMethod }) => {
   // build invoice
   const invoice = await buildInvoice({ data, cartBooks, shippingMethod });
+  const newInvoiceDraft = await createDraftInvoice({ invoice });
+
   return invoice;
 };
 
