@@ -1,0 +1,20 @@
+{
+  "kind": "singleType",
+  "collectionName": "carts",
+  "info": {
+    "name": "Cart"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "shipping": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shop.shipping",
+      "required": true
+    }
+  }
+}

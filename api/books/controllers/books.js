@@ -40,8 +40,6 @@ module.exports = {
         return book;
       });
 
-    console.log(books);
-    console.log(books.length);
     return books;
   },
   async findOnePublic(ctx) {
