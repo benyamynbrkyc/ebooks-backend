@@ -119,7 +119,6 @@ const buildInvoice = async ({ data, cartBooks, shippingMethod }) => {
 };
 
 const createDraftInvoice = async ({ invoice }) => {
-  console.log();
   try {
     const config = {
       method: "post",
@@ -134,12 +133,9 @@ const createDraftInvoice = async ({ invoice }) => {
     };
 
     const { data: newInvoiceDraft } = await axios(config);
-    console.log(newInvoiceDraft);
     return newInvoiceDraft;
-    console.log(data);
   } catch (error) {
     console.error({ ...error });
-    console.log(error.response.data);
     throw error;
   }
 };

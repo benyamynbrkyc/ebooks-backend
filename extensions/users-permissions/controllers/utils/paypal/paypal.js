@@ -20,7 +20,6 @@ const verifyPayPalOrderId = async (clientOrderId) => {
     };
 
     const { data } = await axios(config);
-    console.log(data);
 
     const transactionId = data.purchase_units[0].payments.captures[0].id;
 
