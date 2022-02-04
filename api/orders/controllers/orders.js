@@ -8,6 +8,7 @@
 const { parseMultipartData, sanitizeEntity } = require("strapi-utils");
 const {
   verifyPayPalOrderId,
+  createInvoice,
 } = require("../../../extensions/users-permissions/controllers/utils/paypal");
 
 const {
@@ -48,7 +49,6 @@ module.exports = {
   },
 
   // process order
-  // TODO: add is ebook order check and add to user's library
   async processOrder(ctx) {
     let user = null;
 
@@ -65,11 +65,19 @@ module.exports = {
 
     // update data
     const {
-      body: { orderId, paypalUserShipping, books: cartBooks, orderType },
+      body: { orderId, books: cartBooks, orderType, shippingMethod },
     } = ctx.request;
 
-    const { status, paypalOrderId, paypalTransactionId, paypalUser } =
-      await verifyPayPalOrderId(orderId, paypalUserShipping);
+    const { status, paypalOrderId, paypalTransactionId, paypalUser, data } =
+      await verifyPayPalOrderId(orderId);
+
+    const invoiceCreated = await createInvoice({
+      data,
+      cartBooks,
+      shippingMethod,
+    });
+
+    return invoiceCreated;
 
     // if order exists in PayPal
     if (status === "OK") {

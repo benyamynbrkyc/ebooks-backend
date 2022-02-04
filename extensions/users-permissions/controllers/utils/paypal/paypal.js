@@ -1,3 +1,6 @@
+const { getRecipient } = require("./helpers");
+const { buildInvoice } = require("./invoice");
+
 const axios = require("axios");
 
 const getPayPalAccessToken = async () => {
@@ -33,10 +36,7 @@ const getPayPalAccessToken = async () => {
 };
 
 // checks if the paypal order exists on paypal's servers
-const verifyPayPalOrderId = async (
-  clientOrderId,
-  paypalUserShippingDetails = null
-) => {
+const verifyPayPalOrderId = async (clientOrderId) => {
   const url = process.env.PAYPAL_API + "/v2/checkout/orders/" + clientOrderId;
 
   const payPalAccessToken = await getPayPalAccessToken();
@@ -52,17 +52,16 @@ const verifyPayPalOrderId = async (
     };
 
     const { data } = await axios(config);
+    console.log(data);
 
     const transactionId = data.purchase_units[0].payments.captures[0].id;
 
-    let paypalUser = {
+    const paypalUser = {
       name: data.payer.name.given_name + " " + data.payer.name.surname,
       email_address: data.payer.email_address,
       payer_id: data.payer.payer_id,
+      paypal_user_address: getRecipient(data).address,
     };
-
-    if (paypalUserShippingDetails)
-      paypalUser.paypal_user_address = paypalUserShippingDetails.address;
 
     return {
       status: "OK",
@@ -80,6 +79,13 @@ const getTransactionId = async (orderId) => {
   const url = process.env.PAYPAL_API + "/v2/checkout/orders/" + clientOrderId;
 };
 
+const createInvoice = async ({ data, cartBooks, shippingMethod }) => {
+  // build invoice
+  const invoice = await buildInvoice({ data, cartBooks, shippingMethod });
+  return invoice;
+};
+
 module.exports = {
   verifyPayPalOrderId,
+  createInvoice,
 };
