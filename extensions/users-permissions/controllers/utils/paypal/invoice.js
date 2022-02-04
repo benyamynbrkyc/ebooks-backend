@@ -19,7 +19,6 @@ const buildInvoice = async ({ data, cartBooks, shippingMethod }) => {
     shippingMethod,
   });
 
-  //   return "hey";
   const invoice = {
     detail: {
       currency_code: "EUR",
@@ -78,19 +77,21 @@ const buildInvoice = async ({ data, cartBooks, shippingMethod }) => {
           currency_code: "EUR",
           value: `${itemTotalValue}`,
         },
-        shipping: {
-          amount: {
-            currency_code: "EUR",
-            value: `${getValueWithoutVat(
-              shippingMethodDetails.price,
-              shippingMethodDetails.vat
-            )}`,
-          },
-          tax: {
-            name: "PDV",
-            percent: `${shippingMethodDetails.vat}`,
-          },
-        },
+        shipping: shippingMethodDetails
+          ? {
+              amount: {
+                currency_code: "EUR",
+                value: `${getValueWithoutVat(
+                  shippingMethodDetails.price,
+                  shippingMethodDetails.vat
+                )}`,
+              },
+              tax: {
+                name: "PDV",
+                percent: `${shippingMethodDetails.vat}`,
+              },
+            }
+          : null,
       },
     },
     payments: {
