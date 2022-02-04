@@ -1,3 +1,4 @@
+const _ = require("lodash");
 const axios = require("axios");
 
 const getPayPalAccessToken = async () => {
@@ -71,11 +72,14 @@ const getItems = async ({ cart, shippingMethod }) => {
     quantity: `${item.quantity}`,
     unit_amount: {
       currency_code: "EUR",
-      value: `${getValueWithoutVat(item.price, shippingMethodDetails.vat)}`,
+      value: `${getValueWithoutVat(
+        item.price,
+        shippingMethodDetails ? shippingMethodDetails.vat : 17.0
+      )}`,
     },
     tax: {
       name: "PDV",
-      percent: `${shippingMethodDetails.vat}`,
+      percent: `${17.0}`,
     },
     item_date: getToday(),
     unit_of_measure: "QUANTITY",
@@ -84,13 +88,23 @@ const getItems = async ({ cart, shippingMethod }) => {
   return items;
 };
 
-const getValueWithoutVat = (value, percent) => value / (1 + percent / 100);
+const getValueWithoutVat = (value, percent) =>
+  _.round(value / (1 + percent / 100), 2);
+
+const getValueWithVat = (value, percent) =>
+  _.round(value * (1 + percent / 100), 2);
 
 const getItemTotalWithoutVat = async ({ cart, shippingMethod }) => {
   const shippingMethodDetails = await getShippingMethodDetails(shippingMethod);
 
   return cart.reduce((acc, item) => {
-    return acc + getValueWithoutVat(item.price, shippingMethodDetails.vat);
+    return (
+      acc +
+      getValueWithoutVat(
+        item.price,
+        shippingMethodDetails ? shippingMethodDetails.vat : 17.0
+      )
+    );
   }, 0);
 };
 
@@ -101,6 +115,7 @@ module.exports = {
   getItems,
   getItemTotalWithoutVat,
   getValueWithoutVat,
+  getValueWithVat,
   getShippingMethodDetails,
   getPayPalAccessToken,
 };
