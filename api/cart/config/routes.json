@@ -9,6 +9,14 @@
       }
     },
     {
+      "method": "POST",
+      "path": "/cart/getTotal",
+      "handler": "cart.getTotal",
+      "config": {
+        "policies": []
+      }
+    },
+    {
       "method": "PUT",
       "path": "/cart",
       "handler": "cart.update",
@@ -20,14 +28,6 @@
       "method": "DELETE",
       "path": "/cart",
       "handler": "cart.delete",
-      "config": {
-        "policies": []
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/cart/getTotal",
-      "handler": "cart.getTotal",
       "config": {
         "policies": []
       }
