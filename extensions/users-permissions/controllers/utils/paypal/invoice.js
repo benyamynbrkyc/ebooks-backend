@@ -118,7 +118,7 @@ const buildInvoice = async ({ data, cartBooks, shippingMethod }) => {
   return invoice;
 };
 
-const createDraftInvoice = async ({ invoice }) => {
+const createDraftInvoice = async ({ newInvoice }) => {
   try {
     const config = {
       method: "post",
@@ -128,14 +128,62 @@ const createDraftInvoice = async ({ invoice }) => {
         "Content-Type": "application/json",
       },
       data: {
-        ...invoice,
+        ...newInvoice,
       },
     };
 
     const { data: newInvoiceDraft } = await axios(config);
     return newInvoiceDraft;
   } catch (error) {
-    console.error({ ...error });
+    console.log("create draft", error.response.data);
+    throw error;
+  }
+};
+
+const getInvoice = async ({ href }) => {
+  try {
+    const config = {
+      method: "get",
+      url: href,
+      headers: {
+        Authorization: `Bearer ${await getPayPalAccessToken()}`,
+        "Content-Type": "application/json",
+      },
+    };
+
+    const { data: invoice } = await axios(config);
+    return invoice;
+  } catch (error) {
+    console.log(error.response.data);
+    throw error;
+  }
+};
+
+const markInvoiceAsPaid = async ({ invoice, transactionId }) => {
+  try {
+    const config = {
+      method: "post",
+      url:
+        process.env.PAYPAL_API +
+        "/v2/invoicing/invoices/" +
+        invoice.id +
+        "/payments",
+      headers: {
+        Authorization: `Bearer ${await getPayPalAccessToken()}`,
+        "Content-Type": "application/json",
+      },
+      data: {
+        type: "PAYPAL",
+        payment_id: transactionId,
+        payment_date: getToday(),
+        method: "PAYPAL",
+      },
+    };
+
+    const { data: paidInvoice } = await axios(config);
+    return paidInvoice;
+  } catch (error) {
+    console.log(error.response.data);
     throw error;
   }
 };
@@ -143,4 +191,6 @@ const createDraftInvoice = async ({ invoice }) => {
 module.exports = {
   buildInvoice,
   createDraftInvoice,
+  getInvoice,
+  markInvoiceAsPaid,
 };

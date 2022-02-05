@@ -1,5 +1,10 @@
 const { getRecipient, getPayPalAccessToken } = require("./helpers");
-const { buildInvoice, createDraftInvoice } = require("./invoice");
+const {
+  buildInvoice,
+  createDraftInvoice,
+  getInvoice,
+  markInvoiceAsPaid,
+} = require("./invoice");
 
 const axios = require("axios");
 
@@ -46,12 +51,19 @@ const getTransactionId = async (orderId) => {
   const url = process.env.PAYPAL_API + "/v2/checkout/orders/" + clientOrderId;
 };
 
-const createInvoice = async ({ data, cartBooks, shippingMethod }) => {
+const createInvoice = async ({
+  data,
+  cartBooks,
+  shippingMethod,
+  transactionId,
+}) => {
   // build invoice
-  const invoice = await buildInvoice({ data, cartBooks, shippingMethod });
-  const newInvoiceDraft = await createDraftInvoice({ invoice });
+  const newInvoice = await buildInvoice({ data, cartBooks, shippingMethod });
+  const newInvoiceDraftMeta = await createDraftInvoice({ newInvoice });
+  const invoice = await getInvoice({ href: newInvoiceDraftMeta.href });
+  const paidInvoice = await markInvoiceAsPaid({ invoice, transactionId });
 
-  return invoice;
+  return paidInvoice;
 };
 
 module.exports = {
