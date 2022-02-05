@@ -6,7 +6,6 @@
  */
 
 const {
-  getItems,
   getItemTotalWithoutVat,
   getShippingMethodDetails,
   getValueWithoutVat,
@@ -21,7 +20,6 @@ module.exports = {
       return ctx.badRequest("Missing parameters");
 
     try {
-      const items = await getItems({ cart: cartBooks, shippingMethod });
       const itemTotalValue = await getItemTotalWithoutVat({
         cart: cartBooks,
         shippingMethod,
