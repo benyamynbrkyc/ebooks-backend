@@ -101,7 +101,7 @@ const getItemTotalWithoutVat = async ({ cart, shippingMethod }) => {
     return (
       acc +
       getValueWithoutVat(
-        item.price,
+        item.price * item.quantity,
         shippingMethodDetails ? shippingMethodDetails.vat : 17.0
       )
     );
