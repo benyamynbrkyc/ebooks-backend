@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_shop_pay_pal_invoices",
+  "info": {
+    "name": "PayPal Invoice",
+    "icon": "file-invoice-dollar"
+  },
+  "options": {},
+  "attributes": {
+    "invoice_id": {
+      "type": "string",
+      "required": true
+    },
+    "invoice_details": {
+      "type": "json",
+      "required": true
+    }
+  }
+}
