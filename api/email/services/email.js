@@ -6,6 +6,7 @@ const {
   createPrintDistributionEmailTemplate,
   createBookSubmittedEmailTemplate,
   createAuthorRequestReviewEmailTemplate,
+  createOrderSuccessfulEmailTemplate,
 } = require("./html-templates");
 
 /**
@@ -111,6 +112,23 @@ module.exports = {
     } catch (error) {
       console.error(error);
       throw { error };
+    }
+  },
+
+  async sendOrderSuccessfulEmail(invoice, user) {
+    const items = invoice.items.map((item) => item.name).join(", ");
+    const invoiceUrl = `${process.env.PAYPAL_INVOICE_URL}/invoice/s/pay/${invoice.id}`;
+    console.log(user);
+    try {
+      await strapi.plugins["email"].services.email.send({
+        to: invoice.primary_recipients[0].billing_info.email_address,
+        cc: user ? user.email : "",
+        subject: "Uspješno ste izvršili narudžbu!",
+        html: createOrderSuccessfulEmailTemplate(items, invoiceUrl),
+      });
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
   },
 };

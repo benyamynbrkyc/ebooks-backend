@@ -75,6 +75,7 @@ module.exports = {
       cartBooks,
       shippingMethod,
       transactionId: paypalTransactionId,
+      user,
     });
 
     // if order exists in PayPal
