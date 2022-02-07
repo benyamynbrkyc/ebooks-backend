@@ -63,6 +63,14 @@ const getShippingMethodDetails = async (shippingMethod) => {
   return shippingMethodDetails;
 };
 
+const getItemTotal = ({ items }) => {
+  const total = items.reduce((acc, item) => {
+    return acc + Number(item.unit_amount.value) * Number(item.quantity);
+  }, 0);
+
+  return toFixed(total, 2);
+};
+
 const getItems = async ({ cart, shippingMethod }) => {
   const shippingMethodDetails = await getShippingMethodDetails(shippingMethod);
 
@@ -72,10 +80,7 @@ const getItems = async ({ cart, shippingMethod }) => {
     quantity: `${item.quantity}`,
     unit_amount: {
       currency_code: "EUR",
-      value: `${getValueWithoutVat(
-        item.price,
-        shippingMethodDetails ? shippingMethodDetails.vat : 17.0
-      )}`,
+      value: `${item.price}`,
     },
     tax: {
       name: "PDV",
@@ -88,34 +93,50 @@ const getItems = async ({ cart, shippingMethod }) => {
   return items;
 };
 
-const getValueWithoutVat = (value, percent) =>
-  _.round(value / (1 + percent / 100), 2);
+const toFixed = (num, fixed) => {
+  var re = new RegExp("^-?\\d+(?:.\\d{0," + (fixed || -1) + "})?");
+  return num.toString().match(re)[0];
+};
+
+const getValueWithoutVat = ({ value, percent, truncated = false }) => {
+  let val;
+
+  if (truncated) {
+    val = value / (1 + percent / 100);
+    val_truncated = toFixed(val, 2);
+
+    return {
+      val,
+      val_truncated,
+    };
+  } else {
+    val = _.round(value / (1 + percent / 100), 2);
+  }
+
+  return val;
+};
 
 const getValueWithVat = (value, percent) =>
   _.round(value * (1 + percent / 100), 2);
 
-const getItemTotalWithoutVat = async ({ cart, shippingMethod }) => {
-  const shippingMethodDetails = await getShippingMethodDetails(shippingMethod);
-
-  return cart.reduce((acc, item) => {
-    return (
-      acc +
-      getValueWithoutVat(
-        item.price * item.quantity,
-        shippingMethodDetails ? shippingMethodDetails.vat : 17.0
-      )
-    );
-  }, 0);
-};
+// const getItemTotalWithoutVat = async ({
+//   cart,
+//   shippingMethod,
+//   truncated = false,
+// }) => {
+//   const shippingMethodDetails = await getShippingMethodDetails(shippingMethod);
+//   return "whatever";
+// };
 
 module.exports = {
   getToday,
   getRecipient,
   getTotalPaid,
   getItems,
-  getItemTotalWithoutVat,
   getValueWithoutVat,
   getValueWithVat,
   getShippingMethodDetails,
   getPayPalAccessToken,
+  getItemTotal,
+  toFixed,
 };

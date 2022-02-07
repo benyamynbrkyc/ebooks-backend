@@ -6,10 +6,11 @@
  */
 
 const {
-  getItemTotalWithoutVat,
   getShippingMethodDetails,
   getValueWithoutVat,
-  getValueWithVat,
+  getItems,
+  getItemTotal,
+  toFixed,
 } = require("../../../extensions/users-permissions/controllers/utils/paypal/helpers");
 
 module.exports = {
@@ -20,27 +21,28 @@ module.exports = {
       return ctx.badRequest("Missing parameters");
 
     try {
-      const itemTotalValue = await getItemTotalWithoutVat({
-        cart: cartBooks,
-        shippingMethod,
-      });
+      const items = await getItems({ cart: cartBooks, shippingMethod });
+      const itemTotalValue = getItemTotal({ items });
 
       let total;
+      console.log(itemTotalValue);
 
       if (orderType === "ebook") {
-        total = getValueWithVat(itemTotalValue, 17);
+        total = itemTotalValue;
       } else {
         const shippingMethodDetails = await getShippingMethodDetails(
           shippingMethod
         );
-        const shippingValue = getValueWithoutVat(
-          shippingMethodDetails.price,
-          shippingMethodDetails.vat
-        );
+        const shippingValue = getValueWithoutVat({
+          value: shippingMethodDetails.price,
+          percent: shippingMethodDetails.vat,
+        });
 
-        total = getValueWithVat(itemTotalValue + shippingValue, 17.0);
+        total = +itemTotalValue + shippingMethodDetails.price;
       }
 
+      total = toFixed(total, 2);
+      console.log(total);
       return total;
     } catch (error) {
       console.error(error);
