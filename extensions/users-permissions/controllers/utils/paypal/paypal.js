@@ -61,9 +61,9 @@ const createInvoice = async ({
   const newInvoice = await buildInvoice({ data, cartBooks, shippingMethod });
   const newInvoiceDraftMeta = await createDraftInvoice({ newInvoice });
   const invoice = await getInvoice({ href: newInvoiceDraftMeta.href });
-  const paidInvoice = await markInvoiceAsPaid({ invoice, transactionId });
+  const { paymentId } = await markInvoiceAsPaid({ invoice, transactionId });
 
-  return paidInvoice;
+  return { invoice, paymentId };
 };
 
 module.exports = {

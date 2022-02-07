@@ -48,7 +48,6 @@ module.exports = {
     }
   },
 
-  // process order
   async processOrder(ctx) {
     let user = null;
 
@@ -71,30 +70,35 @@ module.exports = {
     const { status, paypalOrderId, paypalTransactionId, paypalUser, data } =
       await verifyPayPalOrderId(orderId);
 
-    const invoiceCreated = await createInvoice({
+    const { invoice, paymentId } = await createInvoice({
       data,
       cartBooks,
       shippingMethod,
+      transactionId: paypalTransactionId,
     });
-
-    return invoiceCreated;
 
     // if order exists in PayPal
     if (status === "OK") {
       try {
         // create order
-        const order = createOrder(
+        const order = createOrder({
           paypalOrderId,
           paypalTransactionId,
           paypalUser,
           user,
           cartBooks,
-          orderType
-        );
+          orderType,
+          invoice: { ...invoice, payment_id: paymentId },
+        });
 
         const newOrder = await strapi.query("orders").create(order);
 
-        return ctx.send({ message: "CREATED", newOrder, paypalOrderId });
+        return ctx.send({
+          message: "CREATED",
+          newOrder,
+          paypalOrderId,
+          invoice,
+        });
       } catch (error) {
         console.error(error);
         return ctx.badRequest(error);
