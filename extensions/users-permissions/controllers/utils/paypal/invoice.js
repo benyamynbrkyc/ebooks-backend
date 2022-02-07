@@ -134,7 +134,6 @@ const createDraftInvoice = async ({ newInvoice }) => {
     const { data: newInvoiceDraft } = await axios(config);
     return newInvoiceDraft;
   } catch (error) {
-    console.log("create draft", error.response.data);
     throw error;
   }
 };
@@ -153,7 +152,6 @@ const getInvoice = async ({ href }) => {
     const { data: invoice } = await axios(config);
     return invoice;
   } catch (error) {
-    console.log(error.response.data);
     throw error;
   }
 };
@@ -182,7 +180,6 @@ const markInvoiceAsPaid = async ({ invoice, transactionId }) => {
     const { data: payment_id } = await axios(config);
     return payment_id;
   } catch (error) {
-    console.log(error.response.data);
     throw error;
   }
 };

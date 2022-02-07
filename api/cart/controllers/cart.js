@@ -25,7 +25,6 @@ module.exports = {
       const itemTotalValue = getItemTotal({ items });
 
       let total;
-      console.log(itemTotalValue);
 
       if (orderType === "ebook") {
         total = itemTotalValue;
@@ -42,7 +41,6 @@ module.exports = {
       }
 
       total = toFixed(total, 2);
-      console.log(total);
       return total;
     } catch (error) {
       console.error(error);
