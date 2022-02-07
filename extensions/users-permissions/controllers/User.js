@@ -339,24 +339,15 @@ module.exports = {
 
     const book = await strapi.services.books.findOne({ id: bookId });
 
+    if (!book) return ctx.notFound("Book not found");
+
     if (book.author.id !== ctx.state.user.author) {
       return ctx.throw(401, "access_denied", { user: user });
     }
 
-    if (!book.price_original) {
-      book.price_original = book.price;
-    }
-
-    let priceChange = book.price;
-    if (bookData.is_on_sale) {
-      priceChange = bookData.price_on_sale;
-    } else {
-      priceChange = bookData.price_original;
-    }
-
     const updatedBook = await strapi
       .query("books")
-      .update({ id: bookId }, { ...bookData, price: priceChange });
+      .update({ id: bookId }, { ...bookData });
 
     ctx.send({
       status: "OK",

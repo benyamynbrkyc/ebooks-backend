@@ -79,7 +79,7 @@
       "type": "boolean",
       "default": false
     },
-    "price_original": {
+    "price_sale": {
       "type": "decimal",
       "required": false
     },
