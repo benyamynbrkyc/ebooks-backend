@@ -15,7 +15,7 @@ function LeftMenuFooter({ version }) {
   // const projectType = PROJECT_TYPE;
   return (
     <Wrapper>
-      <div className="poweredBy">eBooks.ba 2021</div>
+      <div className="poweredBy">eBooks.ba</div>
     </Wrapper>
   );
 }
