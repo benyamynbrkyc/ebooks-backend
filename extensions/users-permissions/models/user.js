@@ -33,9 +33,8 @@ module.exports = {
             );
           }
 
-          // TODO: uncomment this when in production
           // send email to the user saying they have been approved as an author
-          //   await strapi.services.email.sendAuthorStatusApprovedEmail(user.email);
+          await strapi.services.email.sendAuthorStatusApprovedEmail(user.email);
         } catch (error) {
           console.error(error);
         }
