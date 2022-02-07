@@ -3,21 +3,17 @@ const {
   getRecipient,
   getToday,
   getItems,
-  getItemTotalWithoutVat,
-  getValueWithoutVat,
+  getItemTotal,
   getShippingMethodDetails,
   getTotalPaid,
   getPayPalAccessToken,
+  getValueWithoutVat,
 } = require("./helpers");
 
 const buildInvoice = async ({ data, cartBooks, shippingMethod }) => {
   const recipient = getRecipient(data);
   const shippingMethodDetails = await getShippingMethodDetails(shippingMethod);
   const items = await getItems({ cart: cartBooks, shippingMethod });
-  const itemTotalValue = await getItemTotalWithoutVat({
-    cart: cartBooks,
-    shippingMethod,
-  });
 
   const invoice = {
     detail: {
@@ -66,7 +62,7 @@ const buildInvoice = async ({ data, cartBooks, shippingMethod }) => {
       },
     ],
     configuration: {
-      tax_inclusive: false,
+      tax_inclusive: true,
       allow_tip: false,
       allow_partial_payment: false,
     },
@@ -75,21 +71,24 @@ const buildInvoice = async ({ data, cartBooks, shippingMethod }) => {
       breakdown: {
         item_total: {
           currency_code: "EUR",
-          value: `${itemTotalValue}`,
+          value: `${getItemTotal({ items })}`,
         },
         shipping: shippingMethodDetails
           ? {
               amount: {
                 currency_code: "EUR",
-                value: `${getValueWithoutVat(
-                  shippingMethodDetails.price,
-                  shippingMethodDetails.vat
-                )}`,
+                value: `${shippingMethodDetails.price}`,
+                // TODO: experiment with VAT
+                // value: `${getValueWithoutVat({
+                //   value: shippingMethodDetails.price,
+                //   percent: shippingMethodDetails.vat,
+                // })}`,
               },
-              tax: {
-                name: "PDV",
-                percent: `${shippingMethodDetails.vat}`,
-              },
+              // TODO: experiment with VAT
+              // tax: {
+              //   name: "PDV",
+              //   percent: `${shippingMethodDetails.vat}`,
+              // },
             }
           : null,
       },
@@ -180,8 +179,8 @@ const markInvoiceAsPaid = async ({ invoice, transactionId }) => {
       },
     };
 
-    const { data: paidInvoice } = await axios(config);
-    return paidInvoice;
+    const { data: payment_id } = await axios(config);
+    return payment_id;
   } catch (error) {
     console.log(error.response.data);
     throw error;
