@@ -115,3 +115,5 @@ build
 yarn.lock
 
 notes.txt
+db
+.env*
