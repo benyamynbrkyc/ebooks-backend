@@ -272,6 +272,13 @@ module.exports = {
       available_ebook: true,
       available_print: body.available_print,
       category: body.categories,
+      additional_info: {
+        year_of_publication: body.year_of_publication,
+        num_of_pages: body.num_of_pages,
+        format_size: body.format_size,
+        binding: body.binding,
+        illustrated: body.illustrated,
+      },
     };
 
     try {
@@ -368,6 +375,21 @@ module.exports = {
     ctx.send(author);
   },
 
+  async editAuthor(ctx) {
+    const { id } = ctx.state.user;
+    console.log(id);
+    console.log(ctx.request.body);
+    try {
+      const updatedAuthor = await strapi
+        .query("authors")
+        .update({ user: id }, { ...ctx.request.body });
+
+      ctx.send(updatedAuthor);
+    } catch (error) {
+      console.error(error);
+      return ctx.notFound("Author not found");
+    }
+  },
   async getMonthlyReport(ctx) {
     const { id } = ctx.state.user;
 

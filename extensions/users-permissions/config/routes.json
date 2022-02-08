@@ -598,6 +598,17 @@
             }
         },
         {
+            "method": "POST",
+            "path": "/users/editAuthor",
+            "handler": "User.editAuthor",
+            "config": {
+                "policies": [
+                    "isAuthor"
+                ],
+                "prefix": ""
+            }
+        },
+        {
             "method": "DELETE",
             "path": "/users/:id",
             "handler": "User.destroy",
