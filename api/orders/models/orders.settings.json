@@ -50,9 +50,9 @@
       "private": true
     },
     "authors": {
+      "via": "orders",
       "private": true,
       "collection": "authors",
-      "via": "orders",
       "dominant": true
     },
     "paypal_invoice": {

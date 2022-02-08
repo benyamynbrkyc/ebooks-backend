@@ -28,7 +28,8 @@
       "required": true
     },
     "category": {
-      "collection": "categories"
+      "collection": "categories",
+      "required": true
     },
     "cover": {
       "model": "file",
@@ -86,7 +87,8 @@
     "additional_info": {
       "type": "component",
       "repeatable": false,
-      "component": "books.additional-info"
+      "component": "books.additional-info",
+      "required": true
     },
     "author": {
       "model": "authors",

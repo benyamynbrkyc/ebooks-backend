@@ -20,9 +20,9 @@
       "collection": "books"
     },
     "user": {
+      "private": true,
       "via": "author",
       "plugin": "users-permissions",
-      "private": true,
       "model": "user"
     },
     "desc_short": {
@@ -46,6 +46,9 @@
     "orders": {
       "via": "authors",
       "collection": "orders"
+    },
+    "spotlight": {
+      "type": "boolean"
     }
   }
 }
