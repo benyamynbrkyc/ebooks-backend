@@ -3,40 +3,40 @@
 module.exports = {
   lifecycles: {
     async afterCreate(result, data) {
-      if (data.user) {
-        try {
-          const orderId = result.id;
-          const userId = data.user.id;
-          await strapi.services.orders.update(
-            { id: orderId },
-            { user: { id: userId } }
-          );
+      if (!data.user || data.order_type == "print") return;
 
-          const user = await strapi.plugins[
-            "users-permissions"
-          ].services.user.fetch({
-            id: userId,
-          });
+      try {
+        const orderId = result.id;
+        const userId = data.user.id;
+        await strapi.services.orders.update(
+          { id: orderId },
+          { user: { id: userId } }
+        );
 
-          const userAlreadyOwnedBooksIds = user.owned_books.map(
-            (book) => book.id
-          );
+        const user = await strapi.plugins[
+          "users-permissions"
+        ].services.user.fetch({
+          id: userId,
+        });
 
-          const newBooksIds = data.Book.filter(
-            (book) => book.edition === "ebook"
-          ).map((book) => Number(book.book_id.toString().replace(/\D/g, "")));
+        const userAlreadyOwnedBooksIds = user.owned_books.map(
+          (book) => book.id
+        );
 
-          let owned_books = [...userAlreadyOwnedBooksIds, ...newBooksIds];
+        const newBooksIds = data.Book.map((book) =>
+          Number(book.book_id.toString().replace(/\D/g, ""))
+        );
 
-          await strapi.plugins["users-permissions"].services.user.edit(
-            { id: userId },
-            {
-              owned_books,
-            }
-          );
-        } catch (error) {
-          console.error(error);
-        }
+        const owned_books = [...userAlreadyOwnedBooksIds, ...newBooksIds];
+
+        await strapi.plugins["users-permissions"].services.user.edit(
+          { id: userId },
+          {
+            owned_books,
+          }
+        );
+      } catch (error) {
+        console.error(error);
       }
     },
   },

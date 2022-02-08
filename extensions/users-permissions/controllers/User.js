@@ -1,12 +1,11 @@
 const _ = require("lodash");
 const { sanitizeEntity, escapeQuery, logger } = require("strapi-utils");
 
-const {
-  verifyPayPalOrderId,
-  verifySubscriptionId,
-  cancelSubscription,
-} = require("./utils/paypal");
+const { verifyPayPalOrderId } = require("./utils/paypal");
+
 const { verifyUser } = require("./utils/user");
+
+const { buildMonthRange, getOrderData } = require("./utils/dashboard");
 
 const sanitizeUser = (user) =>
   sanitizeEntity(user, {
@@ -19,9 +18,8 @@ const formatError = (error) => [
 
 const { getBook } = require("./utils/reader.js");
 const { processBookmarks } = require("./utils/bookmarks");
-const { compileData } = require("./utils/dashboard");
 
-const { queryMonthOrders, generateMonthlyReport } = require("./utils/month");
+const { checkEmail } = require("./utils/email-validator");
 
 module.exports = {
   async updateMe(ctx) {
@@ -50,230 +48,6 @@ module.exports = {
       .query("user", "users-permissions")
       .findOne({ id }, ["role", "owned_books"]);
     ctx.send({ ...data });
-  },
-
-  // process order
-  // TODO: add is ebook order check and add to user's library
-  async processOrder(ctx) {
-    const { id } = ctx.state.user;
-
-    // get user and verify
-    const user = await strapi.plugins["users-permissions"].services.user.fetch({
-      id,
-    });
-
-    verifyUser(ctx, user);
-
-    // update data
-    const body = {
-      ...ctx.request.body,
-    };
-
-    const verifyData = await verifyPayPalOrderId(body.orderId);
-    const status = verifyData.status;
-
-    // if order exists in PayPal
-    if (status === "OK") {
-      const paypalOrderId = verifyData.data.id;
-      const paypalTransactionId = verifyData.data.transactionId;
-      const paypalUser = {
-        name:
-          verifyData.data.payer.name.given_name +
-          " " +
-          verifyData.data.payer.name.surname,
-        email_address: verifyData.data.payer.email_address,
-        payer_id: verifyData.data.payer.payer_id,
-        paypal_user_address: body.paypalUserShipping.address,
-      };
-      const orderObj = {
-        paypal_order_id: paypalOrderId,
-        paypal_transaction_id: paypalTransactionId,
-        books: body.bookIds.map((bookId) => {
-          return { id: bookId };
-        }),
-        user: { id: body.userId },
-        Book: body.books.map((book) => {
-          return {
-            title: book.title,
-            quantity: book.quantity,
-            book_id: Number(book.book_id.toString().replace(/\D/g, "")),
-            edition: book.edition,
-            ebook: book.edition == "ebook",
-            book_data: { ...book },
-          };
-        }),
-        paypal_user: paypalUser,
-        completed: false,
-        published_at: null,
-      };
-
-      try {
-        const entity = await strapi.query("orders").create(orderObj);
-        return ctx.send({ message: "CREATED", entity, paypalOrderId });
-      } catch (error) {
-        return ctx.badRequest(error);
-      }
-    } else {
-      // TODO: refactor for a better response
-      return ctx.badRequest("Does not exist");
-    }
-  },
-
-  async processOrderPublic(ctx) {
-    const body = ctx.request.body;
-
-    const verifyData = await verifyPayPalOrderId(body.orderId);
-    const status = verifyData.status;
-
-    if (status === "OK") {
-      const paypalOrderId = verifyData.data.id;
-      const paypalTransactionId = verifyData.data.transactionId;
-      const paypalUser = {
-        name:
-          verifyData.data.payer.name.given_name +
-          " " +
-          verifyData.data.payer.name.surname,
-        email_address: verifyData.data.payer.email_address,
-        payer_id: verifyData.data.payer.payer_id,
-        Paypal_user_address: { ...body.paypalUserShipping.address },
-      };
-
-      const orderObj = {
-        paypal_order_id: paypalOrderId,
-        paypal_transaction_id: paypalTransactionId,
-        books: body.bookIds.map((bookId) => {
-          return { id: bookId };
-        }),
-        Book: body.books.map((book) => {
-          return {
-            title: book.title,
-            quantity: book.quantity,
-            book_id: book.book_id,
-            edition: book.edition,
-          };
-        }),
-        paypal_user: paypalUser,
-        completed: false,
-        published_at: null,
-      };
-
-      try {
-        const entity = await strapi.query("orders").create(orderObj);
-        return ctx.send({ message: "CREATED", entity });
-      } catch (error) {
-        return ctx.badRequest(error);
-      }
-    } else {
-      return ctx.badRequest("Does not exist");
-    }
-  },
-
-  async processSubscription(ctx) {
-    const { id } = ctx.state.user;
-
-    const user = await strapi.plugins["users-permissions"].services.user.fetch({
-      id,
-    });
-
-    verifyUser(ctx, user);
-
-    const { body } = ctx.request;
-    const { subscriptionId } = body;
-
-    try {
-      const { subscription: subscriptionPaypal } = await verifySubscriptionId(
-        subscriptionId
-      );
-
-      if (subscriptionPaypal.status) {
-        const updatedUser = await strapi.plugins[
-          "users-permissions"
-        ].services.user.edit(
-          { id },
-          {
-            isSubscriber: true,
-            subscription_details: JSON.stringify(subscriptionPaypal),
-            subscription_id: subscriptionPaypal.id,
-            role: {
-              id: 3,
-            },
-          }
-        );
-
-        ctx.send({
-          status: subscriptionPaypal.status,
-          subscriptionData: subscriptionPaypal,
-          updatedUser,
-        });
-      } else {
-        ctx.badRequest({ error: "NOT_FOUND", body });
-      }
-    } catch (error) {
-      ctx.badRequest(error);
-    }
-  },
-
-  async cancelSubscription(ctx) {
-    const { id } = ctx.state.user;
-
-    const user = await strapi.plugins["users-permissions"].services.user.fetch({
-      id,
-    });
-
-    verifyUser(ctx, user);
-
-    const userSubscriptionDetails = JSON.parse(user.subscription_details);
-
-    const subscriptionId = userSubscriptionDetails.id;
-
-    const { subscription: subscriptionPaypal } = await verifySubscriptionId(
-      subscriptionId
-    );
-
-    if (subscriptionPaypal.status) {
-      // if the subscription is already cancelled or inactive
-      if (subscriptionPaypal.status !== "ACTIVE") {
-        const updatedUser = await strapi.plugins[
-          "users-permissions"
-        ].services.user.edit(
-          { id },
-          {
-            isSubscriber: false,
-            subscription_details: JSON.stringify({}),
-            role: {
-              id: 1,
-            },
-            books_in_library: [],
-          }
-        );
-
-        return ctx.send({
-          message: "Subscription is already cancelled",
-          status: "CANCELLED",
-          updatedUser,
-        });
-      }
-
-      try {
-        const cancelledSubscription = await cancelSubscription(
-          subscriptionPaypal.id,
-          id
-        );
-
-        ctx.send({
-          subscriptionId,
-          ...subscriptionPaypal,
-          cancelledSubscription,
-        });
-      } catch (error) {
-        ctx.badRequest(error);
-      }
-    } else {
-      ctx.send({
-        error: subscriptionPaypal.error,
-        ...subscriptionPaypal,
-      });
-    }
   },
 
   async getBook(ctx) {
@@ -390,7 +164,7 @@ module.exports = {
         library: updatedUser.books_in_library,
         status: "OK",
       });
-    } else if (!book.sponsored && !user.subscriber) {
+    } else if (!book.sponsored) {
       return ctx.badRequest();
     }
 
@@ -424,6 +198,7 @@ module.exports = {
   },
   async submitRequestToBecomeAuthor(ctx) {
     const { id } = ctx.state.user;
+    const { to } = ctx.request.body;
 
     const user = await strapi.plugins["users-permissions"].services.user.fetch({
       id,
@@ -440,25 +215,36 @@ module.exports = {
         }
       );
 
-      ctx.send({ updatedUser, status: "OK" });
+      await strapi.services.email.sendAuthorRequestSubmittedEmail(to);
+      await strapi.services.email.sendAuthorRequestReviewEmail({
+        email: to,
+        full_name: user.first_name + " " + user.last_name,
+        username: user.username,
+        id,
+      });
+
+      ctx.send({
+        has_submitted_author_request: updatedUser.has_submitted_author_request,
+        status: "OK",
+      });
     } catch (error) {
-      ctx.badRequest("Could not update user.");
+      ctx.throw(500);
     }
   },
 
-  async getDataAll(ctx) {
-    const { id } = ctx.state.user;
-
-    const user = await strapi.plugins["users-permissions"].services.user.fetch({
-      id,
-    });
-    verifyUser(ctx, user);
-
-    const data = await compileData(user);
-
-    ctx.send(data);
-  },
-
+  /*
+  expected body contents:
+  {
+    title,
+    description,
+    price,
+    publisher,
+    available_print,
+    categories,
+    coverId,
+    epubId
+  }
+  */
   async submitNewBook(ctx) {
     const { id } = ctx.state.user;
 
@@ -469,20 +255,49 @@ module.exports = {
 
     const body = ctx.request.body;
 
+    const author = await strapi.query("authors").findOne({ "user.id": id });
+
+    if (!author) return ctx.notFound("Author not found");
+
     const book = {
       title: body.title.charAt(0).toUpperCase() + body.title.slice(1),
-      author: user.first_name + " " + user.last_name,
+      author: author.id,
       publisher: body.publisher,
       description: body.description,
       price: parseFloat(Number(body.price).toFixed(2)),
       cover: { id: body.coverId },
       e_book_epub: { id: body.epubId },
-      authored_by: { id: user.id },
       published_at: null,
+      sponsored: false,
+      available_ebook: true,
+      available_print: body.available_print,
+      category: body.categories,
+      additional_info: {
+        year_of_publication: body.year_of_publication,
+        num_of_pages: body.num_of_pages,
+        format_size: body.format_size,
+        binding: body.binding,
+        illustrated: body.illustrated,
+      },
     };
 
     try {
       const createdBook = await strapi.services.books.create(book);
+      // update author books list
+      await strapi.services.authors.update(
+        { id: author.id },
+        { books: [...author.books, createdBook.id] }
+      );
+      await strapi.services.email.sendBookSubmittedEmail({
+        ...createdBook,
+        author,
+      });
+
+      if (createdBook.available_print)
+        await strapi.services.email.sendPrintDistributionEmail({
+          ...createdBook,
+          author,
+        });
 
       ctx.send(createdBook);
     } catch (error) {
@@ -531,24 +346,15 @@ module.exports = {
 
     const book = await strapi.services.books.findOne({ id: bookId });
 
-    if (book.authored_by.id !== id) {
+    if (!book) return ctx.notFound("Book not found");
+
+    if (book.author.id !== ctx.state.user.author) {
       return ctx.throw(401, "access_denied", { user: user });
-    }
-
-    if (!book.price_original) {
-      book.price_original = book.price;
-    }
-
-    let priceChange = book.price;
-    if (bookData.is_on_sale) {
-      priceChange = bookData.price_on_sale;
-    } else {
-      priceChange = bookData.price_original;
     }
 
     const updatedBook = await strapi
       .query("books")
-      .update({ id: bookId }, { ...bookData, price: priceChange });
+      .update({ id: bookId }, { ...bookData });
 
     ctx.send({
       status: "OK",
@@ -557,20 +363,96 @@ module.exports = {
     });
   },
 
-  async getMonthlyReport(ctx) {
-    const created_at_gte = ctx.query.created_at_gte;
-    const created_at_lte = ctx.query.created_at_lte;
+  async getAuthorProfile(ctx) {
+    const { id } = ctx.state.user;
 
-    // const monthData = await queryMonthOrders(created_at_gte, created_at_lte);
+    const author = await strapi
+      .query("authors")
+      .findOne({ "user.id": id }, ["books.cover"]);
 
-    // const monthlyReport = await generateMonthlyReport(monthData);
+    if (!author) return ctx.notFound("Author not found");
 
-    ctx.send({ created_at_gte, created_at_lte });
+    ctx.send(author);
   },
-  /**
-   * Retrieve authenticated user.
-   * @return {Object|Array}
-   */
+
+  async editAuthor(ctx) {
+    const { id } = ctx.state.user;
+    console.log(id);
+    console.log(ctx.request.body);
+    try {
+      const updatedAuthor = await strapi
+        .query("authors")
+        .update({ user: id }, { ...ctx.request.body });
+
+      ctx.send(updatedAuthor);
+    } catch (error) {
+      console.error(error);
+      return ctx.notFound("Author not found");
+    }
+  },
+  async getMonthlyReport(ctx) {
+    const { id } = ctx.state.user;
+
+    const { year, month } = ctx.params;
+
+    try {
+      const ordersInMonth = await strapi.query("orders").find({
+        ...buildMonthRange(year, month),
+        _limit: -1,
+      });
+
+      try {
+        const {
+          author: { id: authorId },
+        } = await strapi.query("user", "users-permissions").findOne({ id: id });
+
+        const data = await getOrderData(authorId, ordersInMonth);
+        if (!data) return (ctx.response.status = 204);
+
+        ctx.send(data);
+      } catch (error) {
+        console.error(error);
+        return ctx.notFound("User is not an author", error);
+      }
+    } catch (error) {
+      console.error(error);
+      ctx.badRequest(error);
+    }
+  },
+
+  async getStats(ctx) {
+    const { id } = ctx.state.user;
+
+    try {
+      const orders = await strapi.query("orders").find({ _limit: -1 });
+
+      try {
+        const {
+          author: { id: authorId },
+          e,
+        } = await strapi.query("user", "users-permissions").findOne({ id });
+
+        try {
+          const data = await getOrderData(authorId, orders);
+          if (!data) return (ctx.response.status = 204);
+
+          const earliestOrder = data.authorOrders[0].date;
+          const latestOrder =
+            data.authorOrders[data.authorOrders.length - 1].date;
+
+          ctx.send({ ...data, earliestOrder, latestOrder });
+        } catch (error) {
+          console.error(error);
+          return ctx.badRequest("Could not fetch orders");
+        }
+      } catch (error) {
+        console.error(error);
+        return ctx.notFound("User is not an author", error);
+      }
+    } catch (error) {
+      ctx.badRequest(error);
+    }
+  },
 
   async me(ctx) {
     let data = await strapi.plugins["users-permissions"].services.user.fetch({
@@ -584,17 +466,34 @@ module.exports = {
     // Send 200 `ok`
     ctx.body = data;
   },
+  async sendContactEmail(ctx) {
+    const {
+      first_name,
+      last_name,
+      email,
+      company_or_organization,
+      subject,
+      message,
+    } = ctx.request.body;
 
-  async sendSuccessfulRegistrationEmail(ctx) {
-    const { to } = ctx.request.body;
+    if (!first_name || !last_name || !email || !subject || !message)
+      return ctx.throw(400, "Fields are missing");
 
     try {
-      await strapi.plugins["email"].services.email.send({
-        to,
-        subject: "Uspješno ste se registrovali na eBooks.ba!",
-        text: "Otkrijte sve što je na našoj platformi...",
-        html: "Hello world!",
-      });
+      const isEmailValid = await checkEmail(email);
+
+      if (!isEmailValid) {
+        return ctx.notAcceptable("Email is not valid");
+      }
+
+      await strapi.services.email.sendContactFormEmail(
+        first_name,
+        last_name,
+        email,
+        company_or_organization,
+        subject,
+        message
+      );
 
       ctx.send("ok");
     } catch (error) {

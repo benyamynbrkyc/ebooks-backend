@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_homepage_author_spotlights",
+  "info": {
+    "name": "AuthorSpotlight",
+    "icon": "highlighter"
+  },
+  "options": {},
+  "attributes": {
+    "authors": {
+      "collection": "authors"
+    }
+  }
+}

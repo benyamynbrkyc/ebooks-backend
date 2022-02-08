@@ -11,7 +11,6 @@ const crypto = require("crypto");
 const _ = require("lodash");
 const grant = require("grant-koa");
 const { sanitizeEntity } = require("strapi-utils");
-const { html } = require("./utils/email-template");
 
 const emailRegExp =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -367,10 +366,6 @@ module.exports = {
       // Send an email to the user.
       await strapi.plugins["email"].services.email.send({
         to: user.email,
-        from:
-          settings.from.email || settings.from.name
-            ? `${settings.from.name} <${settings.from.email}>`
-            : undefined,
         replyTo: settings.response_email,
         subject: settings.object,
         text: settings.message,
@@ -544,18 +539,7 @@ module.exports = {
         _.pick(user, ["id"])
       );
 
-      console.log(
-        "%cAuth.js line:546 params.email",
-        "color: #007acc;",
-        params.email
-      );
-      await strapi.plugins["email"].services.email.send({
-        to: params.email,
-        subject: "Uspješno ste se registrovali na eBooks.ba!",
-        text: "Dobrodošli na eBooks.ba! Istražite našu prostranu biblioteku knjiga i uživajte u njima u digitalnoj ili fizičkoj formi. Kupite svoju prvu knjigu na našoj platformi: https://ebooks.ba/shop. Ako ste dobili ovaj e-mail već ste ulogovani u Vaš profil. Ukoliko to nije slučaj, posjetite sljedeći link da se ulogujete: https://ebooks.ba/login. Kliknite na link ispod da vidite Vaš profil: https://ebooks.ba/profile/",
-        html,
-      });
-      console.log(jwt);
+      await strapi.services.email.sendSuccessfulRegistrationEmail(params.email);
 
       return ctx.send({
         jwt,
@@ -652,6 +636,24 @@ module.exports = {
       });
     } catch (err) {
       return ctx.badRequest(null, err);
+    }
+  },
+
+  // verify that code belongs to a user
+  async verifyPasswordResetToken(ctx) {
+    const { code } = ctx.request.body;
+
+    try {
+      const user = await strapi
+        .query("user", "users-permissions")
+        .findOne({ resetPasswordToken: `${code}` });
+
+      if (!user) return ctx.notFound("User not found. Code invalid.");
+
+      ctx.send({ message: "OK", email: user.email });
+    } catch (error) {
+      console.error(error);
+      return ctx.throw(500, "An error occurred.");
     }
   },
 };

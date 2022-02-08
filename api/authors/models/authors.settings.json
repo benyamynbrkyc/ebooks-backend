@@ -21,9 +21,9 @@
     },
     "user": {
       "private": true,
+      "via": "author",
       "plugin": "users-permissions",
-      "model": "user",
-      "via": "author"
+      "model": "user"
     },
     "desc_short": {
       "type": "string",
@@ -42,6 +42,13 @@
       "plugin": "upload",
       "required": false,
       "pluginOptions": {}
+    },
+    "orders": {
+      "via": "authors",
+      "collection": "orders"
+    },
+    "spotlight": {
+      "type": "boolean"
     }
   }
 }

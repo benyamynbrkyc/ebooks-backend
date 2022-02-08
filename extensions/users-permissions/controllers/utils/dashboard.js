@@ -1,237 +1,196 @@
-const {
-  isInArray,
-  merge,
-  updateItemInfoInArr,
-  getEarned,
-  getIndividual,
-} = require("./utils");
+const _ = require("lodash");
 
-const sanitizeOrder = (order, authorId) => {
-  let sanitizedOrder = { ...order };
-
-  delete sanitizedOrder.paypal_order_id;
-  delete sanitizedOrder.completed;
-  delete sanitizedOrder.user;
-  delete sanitizedOrder.paypal_transaction_id;
-  delete sanitizedOrder.created_by;
-  delete sanitizedOrder.updated_by;
-  delete sanitizedOrder.created_at;
-  delete sanitizedOrder.updated_at;
-
-  sanitizedOrder.books = sanitizedOrder.books.filter(
-    (b) => b.authored_by == authorId
-  );
-
-  sanitizedOrder.Book.forEach(
-    (book) => (book.published_at = order.published_at)
-  );
-
-  sanitizedOrder = {
-    ...sanitizedOrder,
-    books: sanitizedOrder.books.map((b) => sanitizeBook(b)),
-  };
-
-  return sanitizedOrder;
+const months = {
+  jan: {
+    start: "01-01",
+    end: "01-31",
+  },
+  feb: {
+    start: "02-01",
+    end: "02-28",
+  },
+  mar: {
+    start: "03-01",
+    end: "03-31",
+  },
+  apr: {
+    start: "04-01",
+    end: "04-30",
+  },
+  may: {
+    start: "05-01",
+    end: "05-31",
+  },
+  jun: {
+    start: "06-01",
+    end: "06-30",
+  },
+  jul: {
+    start: "07-01",
+    end: "07-31",
+  },
+  aug: {
+    start: "08-01",
+    end: "08-31",
+  },
+  sep: {
+    start: "09-01",
+    end: "09-30",
+  },
+  oct: {
+    start: "10-01",
+    end: "10-31",
+  },
+  nov: {
+    start: "11-01",
+    end: "11-30",
+  },
+  dec: {
+    start: "12-01",
+    end: "12-31",
+  },
 };
 
-const sanitizeBook = (book) => {
-  const sanitizedBook = { ...book };
+const buildMonthRange = (year, monthName) => {
+  const month = months[`${monthName}`];
 
-  delete sanitizedBook.in_stock;
-  delete sanitizedBook.sponsored;
-  delete sanitizedBook.created_by;
-  delete sanitizedBook.updated_by;
-  delete sanitizedBook.created_at;
-  delete sanitizedBook.updated_at;
+  if (!month) {
+    throw {
+      status: 400,
+      message: "That month does not exist.",
+    };
+  }
 
-  return sanitizedBook;
-};
-
-const booksByAuthor = async (authorId) =>
-  await strapi.services.books.find({ authored_by: authorId });
-
-const getOrdersForAuthor = async (authorId) => {
-  const authorBooks = await booksByAuthor(authorId);
-
-  const bookIds = authorBooks.map((b) => b.id);
-
-  const allOrders = await strapi.services.orders.find({});
-
-  const authorOrders = allOrders
-    .map((order) => {
-      const foundBook = order.Book.find((b) => bookIds.includes(b.book_id));
-      if (foundBook) {
-        return sanitizeOrder(order, authorId);
-      }
-    })
-    .filter((o) => o); // quickly return non-null/non-undefined values
-
-  return { authorOrders, count: authorOrders.length, authorBooks };
-};
-
-// booksOrdered - array of books in the order object
-// booksInfo -    array of full book objects related to the ordered books
-const getBookDataForOrder = (booksOrdered, booksInfo) => {
-  // array of objects representing each order with quantity, name, total price, id
-  let sold = [];
-  let soldEbooks = [];
-  let soldPrints = [];
-  let individual = {
-    totalIndividualBooksSold: 0,
-    totalIndividualEbooksSold: 0,
-    totalIndividualPrintsSold: 0,
-  };
-
-  booksOrdered.forEach((bookOrder) => {
-    booksInfo.forEach((b) => {
-      if (b.id == bookOrder.book_id) {
-        const item = {
-          orderId: bookOrder.id,
-          book_id: b.id,
-          title: bookOrder.title,
-          quantity: bookOrder.quantity,
-          edition: bookOrder.edition,
-          priceByOne: b.price,
-          priceTotal: Number(b.price) * Number(bookOrder.quantity),
-          cover: b.cover,
-          published_at: bookOrder.published_at,
-        };
-
-        if (bookOrder.edition == "print") {
-          soldPrints.push(item);
-          individual.totalIndividualPrintsSold += item.quantity;
-        } else if (bookOrder.edition == "ebook") {
-          soldEbooks.push(item);
-          individual.totalIndividualEbooksSold += item.quantity;
-        }
-
-        sold.push(item);
-        individual.totalIndividualBooksSold += item.quantity;
-      }
-    });
-  });
-
-  const totalEarned = sold.reduce(
-    (total, current) => total + current.priceTotal,
-    0
-  );
-
-  const totalEarnedEbooks = soldEbooks.reduce(
-    (total, current) => total + current.priceTotal,
-    0
-  );
-  const totalEarnedPrints = soldPrints.reduce(
-    (total, current) => total + current.priceTotal,
-    0
-  );
+  const created_at_gte = `${year}-${month.start}T00:00:00`;
+  const created_at_lte = `${year}-${month.end}T23:59:59`;
 
   return {
-    sales: {
-      items: {
-        sold,
-        soldEbooks,
-        soldPrints,
-      },
-      individual,
-      earned: {
-        totalEarned,
-        totalEarnedEbooks,
-        totalEarnedPrints,
-      },
-    },
+    created_at_gte,
+    created_at_lte,
   };
 };
 
-const getBookData = (orders) => {
-  let soldEbooks = [];
-  let soldPrints = [];
+const getCopiesSoldByBook = (soldItems) => {
+  let books = {};
 
-  const ordersSummary = orders.map((order) =>
-    getBookDataForOrder(order.Book, order.books)
-  );
-
-  ordersSummary.forEach((order) => {
-    // Ebooks handler
-    order.sales.items.soldEbooks.forEach((book) => {
-      delete book.orderId;
-
-      if (!isInArray(soldEbooks, book.book_id)) {
-        soldEbooks.push(book);
-      } else {
-        const existingItemIdx = soldEbooks.findIndex(
-          (b) => b.book_id == book.book_id
-        );
-        const existingItem = soldEbooks.find((b) => b.book_id == book.book_id);
-
-        const updatedItem = {
-          ...existingItem,
-          quantity: existingItem.quantity + book.quantity,
-          priceTotal:
-            existingItem.priceByOne * (existingItem.quantity + book.quantity),
-        };
-
-        soldEbooks[existingItemIdx] = updatedItem;
-      }
-    });
-
-    // Prints handler
-    order.sales.items.soldPrints.forEach((book) => {
-      delete book.orderId;
-
-      if (!isInArray(soldPrints, book.book_id)) {
-        soldPrints.push(book);
-      } else {
-        const existingItemIdx = soldPrints.findIndex(
-          (b) => b.book_id == book.book_id
-        );
-        const existingItem = soldPrints.find((b) => b.book_id == book.book_id);
-        let q = existingItem.quantity;
-
-        const updatedItem = {
-          ...existingItem,
-          quantity: existingItem.quantity + book.quantity,
-          priceTotal:
-            existingItem.priceByOne * (existingItem.quantity + book.quantity),
-        };
-
-        soldPrints[existingItemIdx] = updatedItem;
-      }
-    });
+  soldItems.forEach((item) => {
+    books[`${item.id}`] = {
+      id: item.id,
+      title: item.title,
+      copiesSold: item.quantity,
+      earned: _.round(item.price * item.quantity, 2),
+      type: {
+        prints: item.edition == "print" ? item.quantity : 0,
+        ebooks: item.edition == "ebook" ? item.quantity : 0,
+      },
+    };
   });
 
-  let sold = merge(soldEbooks, soldPrints, "book_id");
-
-  const earned = { ...getEarned(sold, soldEbooks, soldPrints) };
-  const individual = { ...getIndividual(sold, soldEbooks, soldPrints) };
-
-  const items = { ...updateItemInfoInArr(sold, soldEbooks, soldPrints) };
-
-  return {
-    items,
-    earned,
-    individual,
-    ordersSummary,
-  };
+  return books;
 };
 
-const compileData = async (user) => {
-  const { id: authorId } = user;
-  const { authorOrders, authorBooks: books } = await getOrdersForAuthor(
-    authorId
-  );
-  const bookData = getBookData(authorOrders);
+const getCopiesSold = async (authorId, authorOrders) => {
+  const author = await strapi.query("authors").findOne({ id: authorId });
+  const authorBooksIds = author.books.map((b) => b.id);
 
-  const data = {
-    authorId,
-    bookData,
-    authorBooks: {
-      books,
-    },
+  let copiesSold = {
+    byBook: {},
+    total: undefined,
+    earned: undefined,
+    ebooks: undefined,
+    prints: undefined,
   };
 
-  return data;
+  authorBooksIds.forEach((id) => {
+    const bookCopiesSold = authorOrders.reduce((acc, order) => {
+      const currentBook = order.copiesSold.copiesSoldByBook[`${id}`];
+      if (currentBook)
+        return acc + order.copiesSold.copiesSoldByBook[`${id}`].copiesSold;
+
+      return acc + 0;
+    }, 0);
+
+    const earned = authorOrders.reduce((acc, order) => {
+      const currentBook = order.copiesSold.copiesSoldByBook[`${id}`];
+      if (currentBook)
+        return acc + order.copiesSold.copiesSoldByBook[`${id}`].earned;
+
+      return acc + 0;
+    }, 0);
+
+    const prints = authorOrders.reduce((acc, order) => {
+      const currentBook = order.copiesSold.copiesSoldByBook[`${id}`];
+      if (currentBook)
+        return acc + order.copiesSold.copiesSoldByBook[`${id}`].type.prints;
+
+      return acc + 0;
+    }, 0);
+
+    const ebooks = authorOrders.reduce((acc, order) => {
+      const currentBook = order.copiesSold.copiesSoldByBook[`${id}`];
+      if (currentBook)
+        return acc + order.copiesSold.copiesSoldByBook[`${id}`].type.ebooks;
+
+      return acc + 0;
+    }, 0);
+
+    copiesSold.byBook[`${id}`] = {
+      id,
+      title: author.books[author.books.findIndex((b) => b.id == id)].title,
+      copiesSold: bookCopiesSold,
+      earned: _.round(earned, 2),
+      type: {
+        prints,
+        ebooks,
+      },
+    };
+  });
+
+  copiesSold.total = Object.values(copiesSold.byBook).reduce(
+    (acc, sale) => acc + sale.copiesSold,
+    0
+  );
+
+  copiesSold.earned = Object.values(copiesSold.byBook).reduce(
+    (acc, sale) => acc + sale.earned,
+    0
+  );
+
+  copiesSold.ebooks = Object.values(copiesSold.byBook).reduce(
+    (acc, sale) => acc + sale.type.ebooks,
+    0
+  );
+
+  copiesSold.prints = Object.values(copiesSold.byBook).reduce(
+    (acc, sale) => acc + sale.type.prints,
+    0
+  );
+
+  return copiesSold;
+};
+
+const getOrderData = async (authorId, orders) => {
+  const authorOrders = orders
+    .filter((o) => o.authors.map((a) => a.id).includes(authorId))
+    .map((o) => ({
+      ...o.order_details.byAuthor[`${authorId}`],
+      date: o.created_at,
+      copiesSold: {
+        copiesSoldByBook: getCopiesSoldByBook(
+          o.order_details.byAuthor[`${authorId}`].items.soldItems
+        ),
+      },
+    }))
+    .reverse();
+
+  if (authorOrders.length === 0) return null;
+
+  const copiesSold = await getCopiesSold(authorId, authorOrders);
+
+  return { authorOrders, copiesSold };
 };
 
 module.exports = {
-  compileData,
+  buildMonthRange,
+  getOrderData,
 };

@@ -8,7 +8,14 @@
 const { parseMultipartData, sanitizeEntity } = require("strapi-utils");
 const {
   verifyPayPalOrderId,
+  createInvoice,
 } = require("../../../extensions/users-permissions/controllers/utils/paypal");
+
+const {
+  verifyUser,
+} = require("../../../extensions/users-permissions/controllers/utils/user");
+
+const { createOrder } = require("./utils/orders");
 
 module.exports = {
   /**
@@ -38,6 +45,68 @@ module.exports = {
       return ctx.send("OK");
     } else {
       return ctx.notFound("The order was not found.");
+    }
+  },
+
+  async processOrder(ctx) {
+    let user = null;
+
+    if (ctx.state.user) {
+      const { id } = ctx.state.user;
+
+      // get user and verify
+      user = await strapi.plugins["users-permissions"].services.user.fetch({
+        id,
+      });
+
+      verifyUser(ctx, user);
+    }
+
+    // update data
+    const {
+      body: { orderId, books: cartBooks, orderType, shippingMethod },
+    } = ctx.request;
+
+    const { status, paypalOrderId, paypalTransactionId, paypalUser, data } =
+      await verifyPayPalOrderId(orderId);
+
+    const { invoice, paymentId } = await createInvoice({
+      data,
+      cartBooks,
+      shippingMethod,
+      transactionId: paypalTransactionId,
+      user,
+    });
+
+    // if order exists in PayPal
+    if (status === "OK") {
+      try {
+        // create order
+        const order = createOrder({
+          paypalOrderId,
+          paypalTransactionId,
+          paypalUser,
+          user,
+          cartBooks,
+          orderType,
+          invoice: { ...invoice, payment_id: paymentId },
+        });
+
+        const newOrder = await strapi.query("orders").create(order);
+
+        return ctx.send({
+          message: "CREATED",
+          newOrder,
+          paypalOrderId,
+          invoice,
+        });
+      } catch (error) {
+        console.error(error);
+        return ctx.badRequest(error);
+      }
+    } else {
+      // TODO: refactor for a better response
+      return ctx.badRequest("Does not exist");
     }
   },
 };

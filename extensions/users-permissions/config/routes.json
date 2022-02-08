@@ -344,6 +344,22 @@
             }
         },
         {
+            "method": "POST",
+            "path": "/auth/verifyPasswordResetToken",
+            "handler": "Auth.verifyPasswordResetToken",
+            "config": {
+                "policies": [
+                    "plugins::users-permissions.ratelimit"
+                ],
+                "prefix": "",
+                "description": "Verify passowrd reset token",
+                "tag": {
+                    "plugin": "users-permissions",
+                    "name": "User"
+                }
+            }
+        },
+        {
             "method": "GET",
             "path": "/auth/email-confirmation",
             "handler": "Auth.emailConfirmation",
@@ -427,44 +443,8 @@
         },
         {
             "method": "POST",
-            "path": "/users/processSubscription",
-            "handler": "User.processSubscription",
-            "config": {
-                "policies": [],
-                "prefix": ""
-            }
-        },
-        {
-            "method": "POST",
             "path": "/users",
             "handler": "User.create",
-            "config": {
-                "policies": [],
-                "prefix": ""
-            }
-        },
-        {
-            "method": "POST",
-            "path": "/users/processOrder",
-            "handler": "User.processOrder",
-            "config": {
-                "policies": [],
-                "prefix": ""
-            }
-        },
-        {
-            "method": "POST",
-            "path": "/users/processOrder/public",
-            "handler": "User.processOrderPublic",
-            "config": {
-                "policies": [],
-                "prefix": ""
-            }
-        },
-        {
-            "method": "POST",
-            "path": "/users/cancelSubscription",
-            "handler": "User.cancelSubscription",
             "config": {
                 "policies": [],
                 "prefix": ""
@@ -526,17 +506,8 @@
         },
         {
             "method": "POST",
-            "path": "/users/sendSuccessfulRegistrationEmail",
-            "handler": "User.sendSuccessfulRegistrationEmail",
-            "config": {
-                "policies": [],
-                "prefix": ""
-            }
-        },
-        {
-            "method": "POST",
-            "path": "/users/author/getData/all",
-            "handler": "User.getDataAll",
+            "path": "/users/sendContactEmail",
+            "handler": "User.sendContactEmail",
             "config": {
                 "policies": [],
                 "prefix": ""
@@ -586,8 +557,30 @@
         },
         {
             "method": "GET",
-            "path": "/users/author/getMonthlyReport",
+            "path": "/users/author/profile",
+            "handler": "User.getAuthorProfile",
+            "config": {
+                "policies": [
+                    "isAuthor"
+                ],
+                "prefix": ""
+            }
+        },
+        {
+            "method": "GET",
+            "path": "/users/author/getMonthlyReport/:year/:month",
             "handler": "User.getMonthlyReport",
+            "config": {
+                "policies": [
+                    "isAuthor"
+                ],
+                "prefix": ""
+            }
+        },
+        {
+            "method": "GET",
+            "path": "/users/author/getStats",
+            "handler": "User.getStats",
             "config": {
                 "policies": [
                     "isAuthor"
@@ -601,6 +594,17 @@
             "handler": "User.editBook",
             "config": {
                 "policies": [],
+                "prefix": ""
+            }
+        },
+        {
+            "method": "POST",
+            "path": "/users/editAuthor",
+            "handler": "User.editAuthor",
+            "config": {
+                "policies": [
+                    "isAuthor"
+                ],
                 "prefix": ""
             }
         },

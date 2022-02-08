@@ -28,7 +28,8 @@
       "required": true
     },
     "category": {
-      "collection": "categories"
+      "collection": "categories",
+      "required": true
     },
     "cover": {
       "model": "file",
@@ -75,28 +76,49 @@
       "required": false,
       "pluginOptions": {}
     },
-    "authored_by": {
-      "plugin": "users-permissions",
-      "model": "user"
-    },
     "is_on_sale": {
       "type": "boolean",
       "default": false
     },
-    "price_original": {
+    "price_sale": {
       "type": "decimal",
       "required": false
     },
     "additional_info": {
       "type": "component",
       "repeatable": false,
-      "component": "books.additional-info"
+      "component": "books.additional-info",
+      "required": true
     },
     "author": {
-      "model": "authors"
+      "model": "authors",
+      "required": true
     },
     "publisher": {
       "model": "publishers"
+    },
+    "total_ebooks_sold": {
+      "type": "integer",
+      "default": 0,
+      "private": true
+    },
+    "total_prints_sold": {
+      "type": "integer",
+      "default": 0,
+      "private": true
+    },
+    "total_sold": {
+      "type": "integer",
+      "default": 0,
+      "private": true
+    },
+    "available_ebook": {
+      "type": "boolean",
+      "required": true
+    },
+    "available_print": {
+      "type": "boolean",
+      "required": true
     }
   }
 }

@@ -62,12 +62,6 @@
     "owned_books": {
       "collection": "books"
     },
-    "isSubscriber": {
-      "type": "boolean",
-      "default": false,
-      "required": false,
-      "unique": false
-    },
     "first_name": {
       "type": "string",
       "default": "FIrst Name",
@@ -83,15 +77,6 @@
       "default": false,
       "required": false
     },
-    "books_in_library": {
-      "collection": "books"
-    },
-    "subscription_details": {
-      "type": "text"
-    },
-    "subscription_id": {
-      "type": "string"
-    },
     "bookmarks": {
       "type": "text"
     },
@@ -105,6 +90,9 @@
     "author": {
       "via": "user",
       "model": "authors"
+    },
+    "books_in_library": {
+      "collection": "books"
     }
   }
 }
