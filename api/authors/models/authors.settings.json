@@ -30,8 +30,7 @@
       "required": true
     },
     "desc_long": {
-      "type": "text",
-      "maxLength": 400
+      "type": "text"
     },
     "image": {
       "model": "file",
