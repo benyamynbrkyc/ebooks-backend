@@ -242,7 +242,7 @@ module.exports = {
     available_print,
     categories,
     coverId,
-    epubId
+    pdfId
   }
   */
   async submitNewBook(ctx) {
@@ -266,7 +266,7 @@ module.exports = {
       description: body.description,
       price: parseFloat(Number(body.price).toFixed(2)),
       cover: { id: body.coverId },
-      e_book_epub: { id: body.epubId },
+      e_book_pdf: { id: body.pdfId },
       published_at: null,
       sponsored: false,
       available_ebook: true,
