@@ -1,4 +1,5 @@
 const _ = require("lodash");
+
 const { sanitizeEntity, escapeQuery, logger } = require("strapi-utils");
 
 const { verifyPayPalOrderId } = require("./utils/paypal");
@@ -16,7 +17,7 @@ const formatError = (error) => [
   { messages: [{ id: error.id, message: error.message, field: error.field }] },
 ];
 
-const { getBook } = require("./utils/reader.js");
+const { getBookReaderUrl } = require("./utils/reader.js");
 const { processBookmarks } = require("./utils/bookmarks");
 
 const { checkEmail } = require("./utils/email-validator");
@@ -59,29 +60,44 @@ module.exports = {
 
     verifyUser(ctx, user);
 
+    const userOwnedBooksIds = [
+      ...user.owned_books.map((book) => book.id),
+      ...user.books_in_library.map((book) => book.id),
+    ];
+
     const { bookId } = ctx.request.body;
 
-    const userOwnedBooksIds = user.owned_books.map((book) => book.id);
+    const entity = await strapi.services.books.findOne({ id: bookId });
+    if (!entity) return ctx.notFound();
 
     if (userOwnedBooksIds.includes(Number(bookId))) {
       try {
-        const url = await getBook(bookId);
+        let book = sanitizeEntity(entity, { model: strapi.models.books });
 
-        ctx.send(url);
+        const eBookUrl = process.env.BASE_API_URL + book.e_book_pdf.url;
+        delete book.e_book_pdf;
+        delete book.e_book_epub;
+
+        ctx.send({ ...book, eBookUrl });
       } catch (error) {
+        console.error(error);
         ctx.badRequest(error);
       }
     } else {
-      return ctx.unauthorized("You don't own this book");
+      return ctx.forbidden("You don't own this book");
     }
   },
 
+  // todo: look into this and if it's even necessary
   async getBookPublic(ctx) {
     const { id } = ctx.params;
     try {
-      const url = await getBook(id);
+      const entity = await strapi.services.books.findOne({ id });
+      const book = sanitizeEntity(entity, { model: strapi.models.books });
 
-      ctx.send(url);
+      const eBookUrl = process.env.BASE_API_URL + book.e_book_pdf.url;
+
+      ctx.send(eBookUrl);
     } catch (error) {
       ctx.badRequest(error);
     }
