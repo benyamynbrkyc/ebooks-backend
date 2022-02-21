@@ -88,7 +88,8 @@ module.exports = {
     if (!book) return ctx.notFound();
 
     if (book.e_book_epub) delete book.e_book_epub;
-
+    if (book.e_book_pdf) delete book.e_book_pdf;
+    
     ctx.send(book);
   },
   async findFreeBooks(ctx) {
