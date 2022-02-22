@@ -60,31 +60,25 @@ module.exports = {
 
     verifyUser(ctx, user);
 
-    const userOwnedBooksIds = [
-      ...user.owned_books.map((book) => book.id),
-      ...user.books_in_library.map((book) => book.id),
-    ];
-
     const { bookId } = ctx.request.body;
 
     const entity = await strapi.services.books.findOne({ id: bookId });
     if (!entity) return ctx.notFound();
 
-    if (userOwnedBooksIds.includes(Number(bookId))) {
-      try {
-        let book = sanitizeEntity(entity, { model: strapi.models.books });
+    try {
+      let book = sanitizeEntity(entity, { model: strapi.models.books });
 
-        const eBookUrl = process.env.BASE_API_URL + book.e_book_pdf.url;
-        delete book.e_book_pdf;
-        delete book.e_book_epub;
+      const eBookUrl = process.env.BASE_API_URL + book.e_book_pdf.url;
+      delete book.e_book_pdf;
+      delete book.e_book_epub;
 
-        ctx.send({ ...book, eBookUrl });
-      } catch (error) {
-        console.error(error);
-        ctx.badRequest(error);
-      }
-    } else {
-      return ctx.forbidden("You don't own this book");
+      ctx.send({ ...book, eBookUrl });
+    } catch (error) {
+      console.error(error);
+      if (error.message == `Cannot read property 'url' of null`)
+        return ctx.throw(503);
+
+      ctx.throw(error);
     }
   },
 
