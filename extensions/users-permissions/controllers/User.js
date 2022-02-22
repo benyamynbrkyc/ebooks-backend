@@ -52,13 +52,14 @@ module.exports = {
   },
 
   async getBook(ctx) {
-    const { id } = ctx.state.user;
+    let user = null;
+    if (ctx.state.user) {
+      user = await strapi.plugins["users-permissions"].services.user.fetch({
+        id: ctx.state.user.id,
+      });
 
-    const user = await strapi.plugins["users-permissions"].services.user.fetch({
-      id,
-    });
-
-    verifyUser(ctx, user);
+      verifyUser(ctx, user);
+    }
 
     const { bookId } = ctx.request.body;
 
