@@ -34,7 +34,10 @@ module.exports = {
           }
 
           // send email to the user saying they have been approved as an author
-          await strapi.services.email.sendAuthorStatusApprovedEmail(user.email);
+          if (process.env.NODE_ENV == "production")
+            await strapi.services.email.sendAuthorStatusApprovedEmail(
+              user.email
+            );
         } catch (error) {
           console.error(error);
         }

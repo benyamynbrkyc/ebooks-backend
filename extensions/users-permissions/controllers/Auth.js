@@ -539,7 +539,10 @@ module.exports = {
         _.pick(user, ["id"])
       );
 
-      await strapi.services.email.sendSuccessfulRegistrationEmail(params.email);
+      if (process.env.NODE_ENV == "production")
+        await strapi.services.email.sendSuccessfulRegistrationEmail(
+          params.email
+        );
 
       return ctx.send({
         jwt,
