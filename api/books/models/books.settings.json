@@ -119,6 +119,21 @@
     "available_print": {
       "type": "boolean",
       "required": true
+    },
+    "price_ebook": {
+      "type": "decimal",
+      "default": 5,
+      "required": true
+    },
+    "price_ebook_sale": {
+      "type": "decimal",
+      "default": 5,
+      "required": true
+    },
+    "is_on_sale_ebook": {
+      "type": "boolean",
+      "default": false,
+      "required": true
     }
   }
 }
