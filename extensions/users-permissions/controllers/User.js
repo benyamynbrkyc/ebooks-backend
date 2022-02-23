@@ -226,13 +226,15 @@ module.exports = {
         }
       );
 
-      await strapi.services.email.sendAuthorRequestSubmittedEmail(to);
-      await strapi.services.email.sendAuthorRequestReviewEmail({
-        email: to,
-        full_name: user.first_name + " " + user.last_name,
-        username: user.username,
-        id,
-      });
+      if (process.env.NODE_ENV == "production")
+        await strapi.services.email.sendAuthorRequestSubmittedEmail(to);
+      if (process.env.NODE_ENV == "production")
+        await strapi.services.email.sendAuthorRequestReviewEmail({
+          email: to,
+          full_name: user.first_name + " " + user.last_name,
+          username: user.username,
+          id,
+        });
 
       ctx.send({
         has_submitted_author_request: updatedUser.has_submitted_author_request,
@@ -270,12 +272,18 @@ module.exports = {
 
     if (!author) return ctx.notFound("Author not found");
 
+    // create book entry
     const book = {
       title: body.title.charAt(0).toUpperCase() + body.title.slice(1),
       author: author.id,
       publisher: body.publisher,
       description: body.description,
       price: parseFloat(Number(body.price).toFixed(2)),
+      price_sale: parseFloat(Number(body.price).toFixed(2)),
+      price_ebook: parseFloat(Number(body.price_ebook).toFixed(2)),
+      price_ebook_sale: parseFloat(Number(body.price_ebook).toFixed(2)),
+      is_on_sale: false,
+      is_on_sale_ebook: false,
       cover: { id: body.coverId },
       e_book_pdf: { id: body.pdfId },
       published_at: null,
@@ -299,16 +307,18 @@ module.exports = {
         { id: author.id },
         { books: [...author.books, createdBook.id] }
       );
-      await strapi.services.email.sendBookSubmittedEmail({
-        ...createdBook,
-        author,
-      });
-
-      if (createdBook.available_print)
-        await strapi.services.email.sendPrintDistributionEmail({
+      if (process.env.NODE_ENV == "production")
+        await strapi.services.email.sendBookSubmittedEmail({
           ...createdBook,
           author,
         });
+
+      if (process.env.NODE_ENV == "production")
+        if (createdBook.available_print)
+          await strapi.services.email.sendPrintDistributionEmail({
+            ...createdBook,
+            author,
+          });
 
       ctx.send(createdBook);
     } catch (error) {
@@ -383,7 +393,10 @@ module.exports = {
 
     if (!author) return ctx.notFound("Author not found");
 
-    ctx.send(author);
+    ctx.send({
+      ...author,
+      books: author.books.filter((b) => b.published_at !== null),
+    });
   },
 
   async editAuthor(ctx) {
@@ -497,14 +510,15 @@ module.exports = {
         return ctx.notAcceptable("Email is not valid");
       }
 
-      await strapi.services.email.sendContactFormEmail(
-        first_name,
-        last_name,
-        email,
-        company_or_organization,
-        subject,
-        message
-      );
+      if (process.env.NODE_ENV == "production")
+        await strapi.services.email.sendContactFormEmail(
+          first_name,
+          last_name,
+          email,
+          company_or_organization,
+          subject,
+          message
+        );
 
       ctx.send("ok");
     } catch (error) {
