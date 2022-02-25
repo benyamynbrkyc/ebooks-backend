@@ -67,6 +67,9 @@ module.exports = {
       body: { orderId, books: cartBooks, orderType, shippingMethod },
     } = ctx.request;
 
+    if (orderType === "ebook" && !user)
+      return ctx.unauthorized("You must be logged in to buy an ebook.");
+
     const { status, paypalOrderId, paypalTransactionId, paypalUser, data } =
       await verifyPayPalOrderId(orderId);
 
