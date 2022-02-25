@@ -66,7 +66,8 @@ const createInvoice = async ({
   const newInvoiceDraftMeta = await createDraftInvoice({ newInvoice });
   const invoice = await getInvoice({ href: newInvoiceDraftMeta.href });
   const paymentId = await markInvoiceAsPaid({ invoice, transactionId });
-  await sendOrderSuccessfulEmail(invoice, user);
+  if (process.env.NODE_ENV == "production")
+    await sendOrderSuccessfulEmail(invoice, user);
 
   return { invoice, paymentId };
 };
