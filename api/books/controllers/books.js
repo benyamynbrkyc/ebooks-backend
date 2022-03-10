@@ -14,7 +14,7 @@ module.exports = {
     const books = entities
       .filter((entity) => entity.published_at != null)
       .map((book) => {
-        delete book.e_book_epub;
+        book?.e_book_epub && delete book.e_book_epub;
         if (book.author) {
           delete book.author.user;
           delete book.author.created_by;
@@ -30,12 +30,12 @@ module.exports = {
           delete book.publisher.published_at;
         }
         // delete book.published_at;
-        delete book.created_by;
-        delete book.updated_by;
-        delete book.created_at;
-        delete book.updated_at;
-        delete book.cover.name;
-        delete book.e_book_pdf;
+        book?.created_by && delete book.created_by;
+        book?.updated_by && delete book.updated_by;
+        book?.created_at && delete book.created_at;
+        book?.updated_at && delete book.updated_at;
+        book?.cover.name && delete book.cover.name;
+        book?.e_book_pdf && delete book.e_book_pdf;
 
         return book;
       });
@@ -51,7 +51,7 @@ module.exports = {
     const books = entities
       .filter((entity) => entity.published_at != null)
       .map((book) => {
-        delete book.e_book_epub;
+        book?.e_book_epub && delete book.e_book_epub;
         if (book.author) {
           delete book.author.user;
           delete book.author.created_by;
@@ -66,13 +66,13 @@ module.exports = {
           delete book.publisher.updated_at;
           delete book.publisher.published_at;
         }
-        // delete book.published_at;
-        delete book.created_by;
-        delete book.updated_by;
-        delete book.created_at;
-        delete book.updated_at;
-        delete book.cover.name;
-        delete book.e_book_pdf;
+
+        book?.created_by && delete book.created_by;
+        book?.updated_by && delete book.updated_by;
+        book?.created_at && delete book.created_at;
+        book?.updated_at && delete book.updated_at;
+        book?.cover.name && delete book.cover.name;
+        book?.e_book_pdf && delete book.e_book_pdf;
 
         return book;
       });
@@ -89,7 +89,7 @@ module.exports = {
 
     if (book.e_book_epub) delete book.e_book_epub;
     if (book.e_book_pdf) delete book.e_book_pdf;
-    
+
     ctx.send(book);
   },
   async findFreeBooks(ctx) {
