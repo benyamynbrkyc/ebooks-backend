@@ -34,7 +34,6 @@ module.exports = {
         book?.updated_by && delete book.updated_by;
         book?.created_at && delete book.created_at;
         book?.updated_at && delete book.updated_at;
-        book?.cover.name && delete book.cover.name;
         book?.e_book_pdf && delete book.e_book_pdf;
 
         return book;
@@ -71,7 +70,6 @@ module.exports = {
         book?.updated_by && delete book.updated_by;
         book?.created_at && delete book.created_at;
         book?.updated_at && delete book.updated_at;
-        book?.cover.name && delete book.cover.name;
         book?.e_book_pdf && delete book.e_book_pdf;
 
         return book;
