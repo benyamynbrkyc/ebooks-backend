@@ -935,7 +935,10 @@ a[x-apple-data-detectors='true'] {
     <p style="font-size: 14px; line-height: 140%;">Va&scaron;a narudžba:</p>
 <p style="font-size: 14px; line-height: 140%;">${items}</p>
 <p style="font-size: 14px; line-height: 140%;">&nbsp;</p>
-<p style="font-size: 14px; line-height: 140%;">Faktura: ${invoiceUrl}</p>
+${
+  invoiceUrl &&
+  `<p style="font-size: 14px; line-height: 140%;">Faktura: ${invoiceUrl}</p>`
+}
   </div>
 
       </td>

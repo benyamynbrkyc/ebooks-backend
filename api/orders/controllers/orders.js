@@ -64,8 +64,24 @@ module.exports = {
 
     // update data
     const {
-      body: { orderId, books: cartBooks, orderType, shippingMethod },
+      body: {
+        orderId,
+        books: cartBooks,
+        orderType,
+        shippingMethod,
+        inPersonPayment = false,
+      },
     } = ctx.request;
+
+    if (inPersonPayment) {
+      const order = createOrder({ cartBooks, orderType, user });
+      const newOrder = await strapi.query("orders").create(order);
+      return ctx.send({
+        message: "CREATED",
+        newOrder,
+        orderType,
+      });
+    }
 
     if (orderType === "ebook" && !user)
       return ctx.unauthorized("You must be logged in to buy an ebook.");
@@ -102,6 +118,7 @@ module.exports = {
           newOrder,
           paypalOrderId,
           invoice,
+          orderType,
         });
       } catch (error) {
         console.error(error);
