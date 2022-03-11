@@ -2,8 +2,6 @@ const _ = require("lodash");
 
 const { sanitizeEntity, escapeQuery, logger } = require("strapi-utils");
 
-const { verifyPayPalOrderId } = require("./utils/paypal");
-
 const { verifyUser } = require("./utils/user");
 
 const { buildMonthRange, getOrderData } = require("./utils/dashboard");
