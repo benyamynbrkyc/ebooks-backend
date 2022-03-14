@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "deliveries",
+  "info": {
+    "name": "Deliveries",
+    "displayName": "Deliveries"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "default": "Ime dostave",
+      "required": true
+    },
+    "price": {
+      "type": "decimal",
+      "default": 5,
+      "required": true
+    }
+  }
+}

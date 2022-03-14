@@ -134,6 +134,9 @@
       "type": "boolean",
       "default": false,
       "required": true
+    },
+    "deliveries": {
+      "collection": "deliveries"
     }
   }
 }
