@@ -7,8 +7,9 @@ const { sanitizeEntity } = require("strapi-utils");
  */
 
 module.exports = {
-  async findPublic() {
-    const entities = await strapi.query("books").find({ _limit: -1 });
+  async findPublic({ query }) {
+    const { _limit } = query;
+    const entities = await strapi.query("books").find({ _limit: _limit || -1 });
 
     const books = entities
       .filter((entity) => entity.published_at != null)
