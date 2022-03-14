@@ -1,0 +1,28 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/currency-exchange-rate",
+      "handler": "currency-exchange-rate.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/currency-exchange-rate",
+      "handler": "currency-exchange-rate.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/currency-exchange-rate",
+      "handler": "currency-exchange-rate.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}

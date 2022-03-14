@@ -1,0 +1,25 @@
+{
+  "kind": "singleType",
+  "collectionName": "currency_exchange_rates",
+  "info": {
+    "name": "CurrencyExchangeRate",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": false
+  },
+  "pluginOptions": {
+    "content-manager": {
+      "visible": true
+    }
+  },
+  "attributes": {
+    "eur_to_bam_rate": {
+      "type": "string",
+      "required": false,
+      "default": "1.9"
+    }
+  }
+}
