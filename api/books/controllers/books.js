@@ -71,9 +71,8 @@ module.exports = {
         columns: ["id"],
         withRelated: [],
       })
-      .map((book) => {
-        if (book.published_at) return book.id;
-      });
+      .filter((book) => book.published_at !== null)
+      .map((book) => book.id);
 
     ctx.send(ids);
   },
