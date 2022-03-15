@@ -65,16 +65,14 @@ module.exports = {
     return freeBooks;
   },
   async getIds(ctx) {
-    const entities = await strapi
+    const ids = await strapi
       .query("books")
-      .model.query((qb) => {
-        qb.where("published_at", "NOT LIKE", "null");
-      })
-      .fetchAll({
+      .model.fetchAll({
         columns: ["id"],
-      });
+        withRelated: [],
+      })
+      .map((book) => book.id);
 
-    const books = entities.map((entity) => entity.id);
-    ctx.send(books);
+    ctx.send(ids);
   },
 };
