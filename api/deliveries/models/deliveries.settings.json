@@ -3,7 +3,8 @@
   "collectionName": "deliveries",
   "info": {
     "name": "Deliveries",
-    "displayName": "Deliveries"
+    "displayName": "Deliveries",
+    "description": ""
   },
   "options": {
     "increments": true,
@@ -18,7 +19,7 @@
     },
     "price": {
       "type": "decimal",
-      "default": 5,
+      "default": 0,
       "required": true
     }
   }

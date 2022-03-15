@@ -135,8 +135,8 @@
       "default": false,
       "required": true
     },
-    "deliveries": {
-      "collection": "deliveries"
+    "delivery": {
+      "model": "deliveries"
     }
   }
 }
