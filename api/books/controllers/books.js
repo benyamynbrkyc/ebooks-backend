@@ -65,12 +65,9 @@ module.exports = {
     return freeBooks;
   },
   async getIds(ctx) {
-    const ids = await strapi
-      .query("books")
-      .model.fetchAll({
-        columns: ["id"],
-        withRelated: [],
-      })
+    const books = await strapi.query("books").find();
+
+    const ids = books
       .filter((book) => book.published_at !== null)
       .map((book) => book.id);
 
