@@ -52,6 +52,7 @@ const getRecipient = (details) => {
 const getTotalPaid = (details) =>
   Number(details.purchase_units[0].amount.value);
 
+// todo: remove
 const getShippingMethodDetails = async (shippingMethod) => {
   const cartSingleType = await strapi.query("cart").find();
   const shippingEnum = cartSingleType[0].shipping;
@@ -71,9 +72,7 @@ const getItemTotal = ({ items }) => {
   return toFixed(total, 2);
 };
 
-const getItems = async ({ cart, shippingMethod }) => {
-  const shippingMethodDetails = await getShippingMethodDetails(shippingMethod);
-
+const getItems = async ({ cart }) => {
   const items = cart.map((item) => ({
     name: item.title,
     description: item.description,
