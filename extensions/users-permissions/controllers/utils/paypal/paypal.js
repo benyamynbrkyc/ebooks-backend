@@ -57,12 +57,12 @@ const getTransactionId = async (orderId) => {
 const createInvoice = async ({
   data,
   cartBooks,
-  shippingMethod,
+  shippingPrice,
   transactionId,
   user,
 }) => {
   // build invoice
-  const newInvoice = await buildInvoice({ data, cartBooks, shippingMethod });
+  const newInvoice = await buildInvoice({ data, cartBooks, shippingPrice });
   const newInvoiceDraftMeta = await createDraftInvoice({ newInvoice });
   const invoice = await getInvoice({ href: newInvoiceDraftMeta.href });
   const paymentId = await markInvoiceAsPaid({ invoice, transactionId });

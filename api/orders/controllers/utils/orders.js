@@ -8,6 +8,8 @@ const createOrder = ({
   cartBooks,
   orderType,
   invoice = null,
+  shippingPrice = 0,
+  cartTotal = 0,
 }) => {
   return {
     paypal_order_id: paypalOrderId,
@@ -37,6 +39,8 @@ const createOrder = ({
           payment_id: invoice.payment_id,
         }
       : null,
+    delivery_price: shippingPrice,
+    price: cartTotal,
   };
 };
 
