@@ -50,8 +50,8 @@
       "private": true
     },
     "authors": {
-      "via": "orders",
       "private": true,
+      "via": "orders",
       "collection": "authors",
       "dominant": true
     },
@@ -59,6 +59,16 @@
       "type": "component",
       "repeatable": false,
       "component": "shop.pay-pal-invoice"
+    },
+    "delivery_price": {
+      "type": "decimal",
+      "default": 0,
+      "required": true
+    },
+    "price": {
+      "type": "decimal",
+      "default": 0,
+      "required": true
     }
   }
 }

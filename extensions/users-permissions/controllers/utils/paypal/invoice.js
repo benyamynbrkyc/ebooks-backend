@@ -4,16 +4,14 @@ const {
   getToday,
   getItems,
   getItemTotal,
-  getShippingMethodDetails,
   getTotalPaid,
   getPayPalAccessToken,
   getValueWithoutVat,
 } = require("./helpers");
 
-const buildInvoice = async ({ data, cartBooks, shippingMethod }) => {
+const buildInvoice = async ({ data, cartBooks, shippingPrice }) => {
   const recipient = getRecipient(data);
-  const shippingMethodDetails = await getShippingMethodDetails(shippingMethod);
-  const items = await getItems({ cart: cartBooks, shippingMethod });
+  const items = await getItems({ cart: cartBooks, shippingPrice });
 
   const invoice = {
     detail: {
@@ -73,21 +71,21 @@ const buildInvoice = async ({ data, cartBooks, shippingMethod }) => {
           currency_code: "EUR",
           value: `${getItemTotal({ items })}`,
         },
-        shipping: shippingMethodDetails
+        shipping: shippingPrice
           ? {
               amount: {
                 currency_code: "EUR",
-                value: `${shippingMethodDetails.price}`,
+                value: `${shippingPrice}`,
                 // TODO: experiment with VAT
                 // value: `${getValueWithoutVat({
-                //   value: shippingMethodDetails.price,
-                //   percent: shippingMethodDetails.vat,
+                //   value: shippingPrice.price,
+                //   percent: shippingPrice.vat,
                 // })}`,
               },
               // TODO: experiment with VAT
               // tax: {
               //   name: "PDV",
-              //   percent: `${shippingMethodDetails.vat}`,
+              //   percent: `${shippingPriceDetails.vat}`,
               // },
             }
           : null,

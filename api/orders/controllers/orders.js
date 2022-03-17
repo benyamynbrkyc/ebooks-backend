@@ -68,13 +68,20 @@ module.exports = {
         orderId,
         books: cartBooks,
         orderType,
-        shippingMethod,
+        shippingPrice,
         inPersonPayment = false,
+        cartTotal,
       },
     } = ctx.request;
 
     if (inPersonPayment) {
-      const order = createOrder({ cartBooks, orderType, user });
+      const order = createOrder({
+        cartBooks,
+        orderType,
+        user,
+        shippingPrice,
+        cartTotal,
+      });
       const newOrder = await strapi.query("orders").create(order);
       return ctx.send({
         message: "CREATED",
@@ -92,7 +99,7 @@ module.exports = {
     const { invoice, paymentId } = await createInvoice({
       data,
       cartBooks,
-      shippingMethod,
+      shippingPrice,
       transactionId: paypalTransactionId,
       user,
     });
@@ -108,6 +115,8 @@ module.exports = {
           user,
           cartBooks,
           orderType,
+          cartTotal,
+          shippingPrice,
           invoice: { ...invoice, payment_id: paymentId },
         });
 
