@@ -69,6 +69,11 @@
       "type": "decimal",
       "default": 0,
       "required": true
+    },
+    "delivery_data": {
+      "type": "component",
+      "repeatable": false,
+      "component": "user.delivery-data"
     }
   }
 }

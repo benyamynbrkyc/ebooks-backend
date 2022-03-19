@@ -176,7 +176,8 @@ const markInvoiceAsPaid = async ({ invoice, transactionId }) => {
     };
 
     const { data: payment_id } = await axios(config);
-    return payment_id;
+
+    return payment_id.payment_id;
   } catch (error) {
     throw error;
   }

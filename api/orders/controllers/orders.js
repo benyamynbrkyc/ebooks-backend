@@ -71,9 +71,14 @@ module.exports = {
         shippingPrice,
         inPersonPayment = false,
         cartTotal,
+        deliveryData = null,
       },
     } = ctx.request;
 
+    if (orderType === "ebook" && !user)
+      return ctx.unauthorized("You must be logged in to buy an ebook.");
+
+    // check if the order will be paid in person
     if (inPersonPayment) {
       const order = createOrder({
         cartBooks,
@@ -81,6 +86,7 @@ module.exports = {
         user,
         shippingPrice,
         cartTotal,
+        deliveryData,
       });
       const newOrder = await strapi.query("orders").create(order);
       return ctx.send({
@@ -90,9 +96,7 @@ module.exports = {
       });
     }
 
-    if (orderType === "ebook" && !user)
-      return ctx.unauthorized("You must be logged in to buy an ebook.");
-
+    // order will be paid through paypal
     const { status, paypalOrderId, paypalTransactionId, paypalUser, data } =
       await verifyPayPalOrderId(orderId);
 
