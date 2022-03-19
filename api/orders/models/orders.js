@@ -3,6 +3,30 @@
 module.exports = {
   lifecycles: {
     async afterCreate(result, data) {
+      // create delivery_data if not already present using
+      // shipping_info from Paypal_user object
+      if (!result.delivery_data) {
+        const { Paypal_user } = result;
+        const first_name = Paypal_user.name.split(" ")[0];
+        const last_name = Paypal_user.name.split(" ").slice(1).join(" ");
+        const address = `${Paypal_user.paypal_user_address.address_line_1}\n${Paypal_user.paypal_user_address.address_line_2}\n${Paypal_user.paypal_user_address.admin_area_1}\n${Paypal_user.paypal_user_address.admin_area_2}\n${Paypal_user.paypal_user_address.postal_code}`;
+        const email = Paypal_user.email_address;
+
+        const delivery_data = {
+          first_name,
+          last_name,
+          address,
+          email,
+          phone: "",
+        };
+
+        await strapi.services.orders.update(
+          { id: result.id },
+          { delivery_data }
+        );
+      }
+
+      // update the user's library with the newly bought book(s)
       if (!data.user || data.order_type == "print") return;
 
       const userId = data.user.id;
