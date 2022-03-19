@@ -10,6 +10,7 @@ const createOrder = ({
   invoice = null,
   shippingPrice = 0,
   cartTotal = 0,
+  deliveryData = null,
 }) => {
   return {
     paypal_order_id: paypalOrderId,
@@ -41,6 +42,13 @@ const createOrder = ({
       : null,
     delivery_price: shippingPrice,
     price: cartTotal,
+    delivery_data: deliveryData
+      ? {
+          first_name: deliveryData.firstName,
+          last_name: deliveryData.lastName,
+          ...deliveryData,
+        }
+      : null,
   };
 };
 
