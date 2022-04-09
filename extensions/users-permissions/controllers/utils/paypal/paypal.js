@@ -61,15 +61,41 @@ const createInvoice = async ({
   transactionId,
   user,
 }) => {
-  // build invoice
-  const newInvoice = await buildInvoice({ data, cartBooks, shippingPrice });
-  const newInvoiceDraftMeta = await createDraftInvoice({ newInvoice });
-  const invoice = await getInvoice({ href: newInvoiceDraftMeta.href });
-  const paymentId = await markInvoiceAsPaid({ invoice, transactionId });
-  if (process.env.NODE_ENV == "production")
-    await sendOrderSuccessfulEmail(invoice, user);
+  if (!shippingPrice) shippingPrice = 0;
 
-  return { invoice, paymentId };
+  // build invoice
+  if (
+    !data ||
+    !cartBooks ||
+    typeof shippingPrice !== "number" ||
+    !transactionId ||
+    !user
+  ) {
+    console.log({
+      data,
+      cartBooks,
+      shippingPrice,
+      transactionId,
+      user,
+    });
+    throw new Error("Missing dependencies");
+  }
+  try {
+    const newInvoice = await buildInvoice({ data, cartBooks, shippingPrice });
+    const newInvoiceDraftMeta = await createDraftInvoice({ newInvoice });
+    const invoice = await getInvoice({ href: newInvoiceDraftMeta.href });
+    // const paymentId = await markInvoiceAsPaid({ invoice, transactionId });
+    if (process.env.NODE_ENV == "production")
+      await sendOrderSuccessfulEmail(invoice, user);
+
+    console.log("Invoice created", { invoice_id: invoice.id, transactionId });
+
+    return { invoice, paymentId: transactionId };
+  } catch (error) {
+    console.log("Error creating invoice");
+    // console.error(error);
+    throw new Error("Error creating invoice");
+  }
 };
 
 module.exports = {
