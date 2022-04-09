@@ -112,6 +112,8 @@ const buildInvoice = async ({ data, cartBooks, shippingPrice }) => {
     },
   };
 
+  console.log("created invoice object -- buildInvoice");
+
   return invoice;
 };
 
@@ -130,8 +132,10 @@ const createDraftInvoice = async ({ newInvoice }) => {
     };
 
     const { data: newInvoiceDraft } = await axios(config);
+    console.log("created draft invoice -- createDraftInvoice");
     return newInvoiceDraft;
   } catch (error) {
+    console.log("could not create draft invoice -- createDraftInvoice");
     throw error;
   }
 };
@@ -148,13 +152,16 @@ const getInvoice = async ({ href }) => {
     };
 
     const { data: invoice } = await axios(config);
+    console.log("invoice found -- getInvoice", invoice.id);
     return invoice;
   } catch (error) {
+    console.log("could not find draft invoice -- getInvoice");
     throw error;
   }
 };
 
 const markInvoiceAsPaid = async ({ invoice, transactionId }) => {
+  console.log("Marking invoice as paid -- markInvoiceAsPaid");
   try {
     const config = {
       method: "post",
@@ -174,11 +181,17 @@ const markInvoiceAsPaid = async ({ invoice, transactionId }) => {
         method: "PAYPAL",
       },
     };
+    console.log(
+      "** configuration data for POST /v2/invoicing/invoices/{invoice_id}/payments",
+      config.data
+    );
 
     const { data: payment_id } = await axios(config);
-
+    console.log("invoice marked as paid -- markInvoiceAsPaid");
     return payment_id.payment_id;
   } catch (error) {
+    console.log("could not mark invoice as paid -- markInvoiceAsPaid");
+    console.log(error.message);
     throw error;
   }
 };

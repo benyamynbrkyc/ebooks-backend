@@ -40,7 +40,7 @@ module.exports = {
     const orderId = ctx.request.body.orderId;
 
     const { status } = await verifyPayPalOrderId(orderId);
-
+    console.log("here");
     if (status === "OK") {
       return ctx.send("OK");
     } else {
@@ -96,10 +96,12 @@ module.exports = {
       });
     }
 
+    console.log("Checking status");
     // order will be paid through paypal
     const { status, paypalOrderId, paypalTransactionId, paypalUser, data } =
       await verifyPayPalOrderId(orderId);
 
+    console.log("Creating invoice");
     const { invoice, paymentId } = await createInvoice({
       data,
       cartBooks,
@@ -107,9 +109,11 @@ module.exports = {
       transactionId: paypalTransactionId,
       user,
     });
+    console.log("Created invoice");
 
     // if order exists in PayPal
     if (status === "OK") {
+      console.log("Status ok");
       try {
         // create order
         const order = createOrder({
@@ -134,6 +138,7 @@ module.exports = {
           orderType,
         });
       } catch (error) {
+        console.log("i throw ***");
         console.error(error);
         return ctx.badRequest(error);
       }
