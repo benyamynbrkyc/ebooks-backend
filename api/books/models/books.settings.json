@@ -95,7 +95,8 @@
       "required": true
     },
     "publisher": {
-      "model": "publishers"
+      "model": "publishers",
+      "required": true
     },
     "total_ebooks_sold": {
       "type": "integer",
@@ -136,7 +137,8 @@
       "required": true
     },
     "delivery": {
-      "model": "deliveries"
+      "model": "deliveries",
+      "required": true
     }
   }
 }
