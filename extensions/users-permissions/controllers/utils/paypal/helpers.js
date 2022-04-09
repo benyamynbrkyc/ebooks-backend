@@ -29,7 +29,6 @@ const getPayPalAccessToken = async () => {
 
     return accessToken;
   } catch (error) {
-    console.log("I threw");
     return error;
   }
 };
