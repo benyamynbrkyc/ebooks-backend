@@ -23,9 +23,12 @@ module.exports = {
     return books;
   },
   async findBestsellers() {
-    const entities = await strapi
-      .query("books")
-      .find({ _limit: 8, _sort: "total_sold:DESC" });
+    const entities = await strapi.query("books").find({
+      price_sale_gte: 0,
+      price_ebook_sale_gte: 0,
+      _limit: 8,
+      _sort: "total_sold:DESC",
+    });
 
     const books = entities
       .filter((entity) => entity.published_at != null)
