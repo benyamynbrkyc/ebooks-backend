@@ -27,6 +27,39 @@
       "unique": false,
       "required": true
     },
+    "price_sale": {
+      "type": "decimal",
+      "required": false
+    },
+    "price_ebook": {
+      "type": "decimal",
+      "default": 5,
+      "required": true
+    },
+    "price_ebook_sale": {
+      "type": "decimal",
+      "default": 5,
+      "required": true
+    },
+    "price_bam": {
+      "type": "decimal",
+      "unique": false,
+      "required": true
+    },
+    "price_sale_bam": {
+      "type": "decimal",
+      "required": false
+    },
+    "price_ebook_bam": {
+      "type": "decimal",
+      "default": 5,
+      "required": true
+    },
+    "price_ebook_sale_bam": {
+      "type": "decimal",
+      "default": 5,
+      "required": true
+    },
     "category": {
       "collection": "categories",
       "required": true
@@ -80,10 +113,6 @@
       "type": "boolean",
       "default": false
     },
-    "price_sale": {
-      "type": "decimal",
-      "required": false
-    },
     "additional_info": {
       "type": "component",
       "repeatable": false,
@@ -119,16 +148,6 @@
     },
     "available_print": {
       "type": "boolean",
-      "required": true
-    },
-    "price_ebook": {
-      "type": "decimal",
-      "default": 5,
-      "required": true
-    },
-    "price_ebook_sale": {
-      "type": "decimal",
-      "default": 5,
       "required": true
     },
     "is_on_sale_ebook": {
