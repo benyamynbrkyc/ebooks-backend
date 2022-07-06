@@ -34,16 +34,4 @@ module.exports = {
 };
 
 const convertToEur = (price, XR) =>
-  currency(price, { fromCents: true }).divide(currency(XR).value).value;
-
-/*
-
-console.log({
-        price_bam: c_price_bam,
-        price_sale_bam: c_price_sale_bam,
-        price_ebook_bam: c_price_ebook_bam,
-        price_ebook_sale_bam: c_price_ebook_sale_bam,
-      });
-
-
-      */
+  currency(price, { fromCents: true }).multiply(0.511292).value;
