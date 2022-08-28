@@ -20,7 +20,7 @@ module.exports = {
         return book;
       });
 
-    return books;
+    return strapi.services.books.filterBooks(books);
   },
   async findBestsellers() {
     const entities = await strapi.query("books").find({
@@ -39,7 +39,7 @@ module.exports = {
         return book;
       });
 
-    return books;
+    return strapi.services.books.filterBooks(books);
   },
   async findOnePublic(ctx) {
     const { id } = ctx.params;
@@ -51,6 +51,11 @@ module.exports = {
 
     if (book.e_book_epub) delete book.e_book_epub;
     if (book.e_book_pdf) delete book.e_book_pdf;
+
+    // check book
+    if (strapi.services.books.filterBooks([book]).length == 0) {
+      return ctx.notFound();
+    }
 
     ctx.send(book);
   },
@@ -65,7 +70,7 @@ module.exports = {
       return entity;
     });
 
-    return freeBooks;
+    return strapi.services.books.filterBooks(books);
   },
   async getIds(ctx) {
     const books = await strapi.query("books").find();
