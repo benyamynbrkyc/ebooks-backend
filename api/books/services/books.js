@@ -12,6 +12,12 @@ module.exports = {
 };
 
 const checkPrint = (book) => {
+  if (book.available_print) {
+    if (!(book.price > 0) || !(book.price_bam > 0)) {
+      return false;
+    }
+  }
+
   if (
     book.is_on_sale &&
     (!(book.price_sale > 0) || !(book.price_sale_bam > 0))
@@ -28,6 +34,12 @@ const checkPrint = (book) => {
 };
 
 const checkEbook = (book) => {
+  if (book.available_ebook) {
+    if (!(book.price_ebook > 0) || !(book.price_ebook_bam > 0)) {
+      return false;
+    }
+  }
+
   if (
     book.is_on_sale_ebook &&
     (!(book.price_ebook_sale > 0) || !(book.price_ebook_sale_bam > 0))
