@@ -26,7 +26,7 @@ module.exports = {
     const entities = await strapi.query("books").find({
       price_sale_gte: 0,
       price_ebook_sale_gte: 0,
-      _limit: 8,
+      _limit: -1,
       _sort: "total_sold:DESC",
     });
 
@@ -39,7 +39,7 @@ module.exports = {
         return book;
       });
 
-    return strapi.services.books.filterBooks(books);
+    return strapi.services.books.filterBooks(books).slice(0, 8);
   },
   async findOnePublic(ctx) {
     const { id } = ctx.params;
