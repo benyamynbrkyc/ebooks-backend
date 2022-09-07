@@ -12,6 +12,8 @@ module.exports = {
 };
 
 const checkPrint = (book) => {
+  if (book.sponsored) return true;
+
   if (book.available_print) {
     if (!(book.price > 0) || !(book.price_bam > 0)) {
       return false;
@@ -34,6 +36,8 @@ const checkPrint = (book) => {
 };
 
 const checkEbook = (book) => {
+  if (book.sponsored) return true;
+
   if (book.available_ebook) {
     if (!(book.price_ebook > 0) || !(book.price_ebook_bam > 0)) {
       return false;
