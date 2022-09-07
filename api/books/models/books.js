@@ -1,7 +1,6 @@
 "use strict";
 
 const currency = require("currency.js");
-const Dinero = require("dinero.js");
 
 module.exports = {
   lifecycles: {
