@@ -50,8 +50,8 @@
       "private": true
     },
     "authors": {
-      "private": true,
       "via": "orders",
+      "private": true,
       "collection": "authors",
       "dominant": true
     },

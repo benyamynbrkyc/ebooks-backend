@@ -24,42 +24,42 @@
     },
     "price": {
       "type": "decimal",
-      "default": 0.00,
+      "default": 0,
       "required": true
     },
     "price_sale": {
       "type": "decimal",
       "required": false,
-      "default": 0.00
+      "default": 0
     },
     "price_ebook": {
       "type": "decimal",
-      "default": 0.00,
+      "default": 0,
       "required": true
     },
     "price_ebook_sale": {
       "type": "decimal",
-      "default": 0.00,
+      "default": 0,
       "required": false
     },
     "price_bam": {
       "type": "decimal",
-      "default": 0.00,
+      "default": 0,
       "required": true
     },
     "price_sale_bam": {
       "type": "decimal",
-      "default": 0.00,
+      "default": 0,
       "required": false
     },
     "price_ebook_bam": {
       "type": "decimal",
-      "default": 0.00,
+      "default": 0,
       "required": true
     },
     "price_ebook_sale_bam": {
       "type": "decimal",
-      "default": 0.00,
+      "default": 0,
       "required": false
     },
     "category": {
@@ -160,6 +160,9 @@
     "delivery": {
       "model": "deliveries",
       "required": true
+    },
+    "sold_out": {
+      "type": "boolean"
     }
   }
 }
