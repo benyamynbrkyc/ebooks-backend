@@ -47,7 +47,8 @@
       "collection": "orders"
     },
     "spotlight": {
-      "type": "boolean"
+      "type": "boolean",
+      "default": false
     }
   }
 }
