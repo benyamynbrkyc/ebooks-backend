@@ -68,7 +68,8 @@ const createInvoice = async ({
     !data ||
     !cartBooks ||
     typeof shippingPrice !== "number" ||
-    !transactionId
+    !transactionId ||
+    !user
   ) {
     console.log({
       data,
@@ -79,12 +80,14 @@ const createInvoice = async ({
     });
     throw new Error("Missing dependencies");
   }
-
   try {
     const newInvoice = await buildInvoice({ data, cartBooks, shippingPrice });
     const newInvoiceDraftMeta = await createDraftInvoice({ newInvoice });
     const invoice = await getInvoice({ href: newInvoiceDraftMeta.href });
-
+    /*
+    // no need to mark as paid in code
+    // const paymentId = await markInvoiceAsPaid({ invoice, transactionId });
+    */
     if (process.env.NODE_ENV == "production")
       await sendOrderSuccessfulEmail(invoice, user);
 
